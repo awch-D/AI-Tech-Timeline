@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI 技术热词时间线 · AI Tech Buzzword Timeline</title>
+<style>
+  :root{
+    --ink:#1d1d1f;
+    --ink-2:#48484a;
+    --ink-3:#8e8e93;
+    --line:rgba(0,0,0,.08);
+    --glass:rgba(255,255,255,.72);
+    --bg:#f5f5f7;
+    --green:#34c759;
+    --orange:#ff9500;
+    --gray:#aeaeb2;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(99,102,241,.10), transparent 60%),
+      radial-gradient(1000px 500px at -10% 20%, rgba(52,199,89,.08), transparent 60%),
+      radial-gradient(900px 700px at 50% 110%, rgba(255,149,0,.07), transparent 60%),
+      var(--bg);
+    height:100vh;overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  /* ---------- Header ---------- */
+  header{
+    flex:0 0 auto;
+    backdrop-filter:blur(20px) saturate(1.6);
+    -webkit-backdrop-filter:blur(20px) saturate(1.6);
+    background:var(--glass);
+    border-bottom:1px solid var(--line);
+    padding:14px 28px;
+    display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+    z-index:20;
+  }
+  .brand{display:flex;align-items:center;gap:12px;min-width:0}
+  .brand svg{flex:0 0 auto}
+  .brand h1{font-size:17px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
+  .search{
+    position:relative;flex:0 1 300px;min-width:200px;margin-left:auto;
+  }
+  .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none}
+  .search input{
+    width:100%;height:34px;padding:0 12px 0 32px;
+    border:1px solid var(--line);border-radius:10px;
+    background:rgba(255,255,255,.8);
+    font-size:13px;color:var(--ink);outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .search input:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+  /* ---------- Layout ---------- */
+  .layout{flex:1 1 auto;display:flex;min-height:0}
+  /* Sidebar */
+  aside{
+    flex:0 0 232px;
+    border-right:1px solid var(--line);
+    background:var(--glass);
+    backdrop-filter:blur(20px) saturate(1.6);
+    -webkit-backdrop-filter:blur(20px) saturate(1.6);
+    padding:20px 16px;overflow-y:auto;
+  }
+  .side-title{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.8px;margin:18px 6px 8px}
+  .side-title:first-child{margin-top:0}
+  .year-item{
+    display:flex;align-items:center;gap:8px;
+    padding:7px 10px;border-radius:9px;cursor:pointer;
+    font-size:13px;color:var(--ink-2);text-decoration:none;
+    transition:background .15s,color .15s;
+  }
+  .year-item:hover{background:rgba(0,0,0,.05)}
+  .year-item.active{background:var(--ink);color:#fff;font-weight:600}
+  .year-item .cnt{margin-left:auto;font-size:11px;color:var(--ink-3)}
+  .year-item.active .cnt{color:rgba(255,255,255,.7)}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;
+    margin:0 6px 8px 0;padding:5px 11px;
+    border:1px solid var(--line);border-radius:999px;
+    font-size:12px;color:var(--ink-2);cursor:pointer;background:rgba(255,255,255,.6);
+    transition:all .15s;user-select:none;
+  }
+  .chip:hover{border-color:rgba(0,0,0,.2)}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .legend{display:flex;flex-direction:column;gap:7px;padding:4px 6px}
+  .legend div{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+  .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+  .dot.g{background:var(--green)} .dot.o{background:var(--orange)} .dot.gr{background:var(--gray)}
+  /* Timeline */
+  main{flex:1 1 auto;overflow-y:auto;padding:28px 40px 120px;scroll-padding-top:20px}
+  .year-block{margin-bottom:14px}
+  .year-head{
+    position:sticky;top:0;z-index:5;
+    display:flex;align-items:center;gap:14px;
+    padding:10px 0;margin-bottom:6px;
+    background:linear-gradient(to bottom, rgba(245,245,247,.95) 70%, transparent);
+  }
+  .year-head h2{font-size:22px;font-weight:800;letter-spacing:.5px}
+  .year-head .hline{flex:1;height:1px;background:var(--line)}
+  .year-head .yc{font-size:12px;color:var(--ink-3)}
+  .entries{position:relative;padding-left:34px}
+  .entries::before{
+    content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(to bottom, rgba(0,0,0,.14), rgba(0,0,0,.05));
+    border-radius:2px;
+  }
+  .entry{position:relative;margin-bottom:12px}
+  .entry::before{
+    content:"";position:absolute;left:-30px;top:22px;width:10px;height:10px;border-radius:50%;
+    background:#fff;border:2px solid var(--ink-3);z-index:1;
+  }
+  .entry.st-handbook::before{border-color:var(--green)}
+  .entry.st-pending::before{border-color:var(--gray)}
+  .card{
+    display:block;text-decoration:none;color:inherit;
+    background:var(--glass);
+    backdrop-filter:blur(14px) saturate(1.5);
+    -webkit-backdrop-filter:blur(14px) saturate(1.5);
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 18px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04);
+    transition:transform .18s, box-shadow .18s, border-color .18s;
+    cursor:pointer;
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(0,0,0,.05),0 14px 34px rgba(0,0,0,.09);border-color:rgba(0,0,0,.16)}
+  .card.no-link{cursor:default}
+  .card.no-link:hover{transform:none;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.04);border-color:var(--line)}
+  .card-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .month{
+    font-size:11px;font-weight:700;color:var(--ink-3);
+    background:rgba(0,0,0,.05);border-radius:6px;padding:2px 8px;
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .term{font-size:15px;font-weight:700}
+  .term-en{font-size:12.5px;color:var(--ink-3);font-weight:500}
+  .badges{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .cat{
+    font-size:11px;color:var(--ink-2);
+    border:1px solid var(--line);border-radius:999px;padding:2px 9px;background:rgba(255,255,255,.5);
+    white-space:nowrap;
+  }
+  .status{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-2);white-space:nowrap}
+  .desc{margin-top:7px;font-size:13px;line-height:1.65;color:var(--ink-2)}
+  .card .go{
+    display:inline-flex;align-items:center;gap:4px;margin-top:8px;
+    font-size:12px;font-weight:600;color:var(--ink);
+  }
+  .card .go svg{transition:transform .18s}
+  .card:hover .go svg{transform:translateX(3px)}
+  .pending-note{font-size:11px;color:var(--ink-3);margin-top:8px}
+  .empty{padding:60px 0;text-align:center;color:var(--ink-3);font-size:14px}
+  /* Toast */
+  #toast{
+    position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);
+    background:var(--ink);color:#fff;font-size:13px;
+    padding:10px 18px;border-radius:12px;opacity:0;pointer-events:none;
+    transition:opacity .25s, transform .25s;z-index:50;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+  /* Responsive */
+  @media (max-width:860px){
+    body{overflow:auto;height:auto}
+    .layout{flex-direction:column}
+    aside{flex:0 0 auto;border-right:none;border-bottom:1px solid var(--line);display:flex;gap:8px;overflow-x:auto;padding:12px}
+    .side-title,.legend{display:none}
+    .year-item{white-space:nowrap}
+    .year-item .cnt{display:none}
+    main{overflow:visible;padding:20px 18px 80px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1d1d1f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+    <h1>AI 技术热词时间线</h1>
+  </div>
+  <div class="search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="q" type="text" placeholder="搜索热词 / 关键词…"/>
+  </div>
+</header>
+
+<div class="layout">
+  <aside id="aside">
+    <div class="side-title">年份导航</div>
+    <nav id="years"></nav>
+    <div class="side-title">类别筛选</div>
+    <div id="cats"></div>
+    <div class="side-title">收录状态</div>
+    <div class="legend">
+      <div><span class="dot g"></span>已有独立手册（点击跳转）</div>
+      <div><span class="dot gr"></span>已收录，详情页待补齐</div>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ================= 数据 =================
+ * status: handbook = 已有独立手册仓库（link 为线上地址）
+ *         pending  = 已收录进时间线，专属详情页待补齐
+ * 条目日期均标注到月；个别词条的“提出时间”存在多个候选节点，
+ * 正式版将按一手来源（论文 / 官方博客 / 发布日）逐条核实并附引用。
+ */
+const DATA = [
+  // ---- 2022 ----
+  {y:2022, m:"2022-11", term:"ChatGPT 引爆对话式 AI", en:"ChatGPT", cat:"产品形态", status:"pending",
+   desc:"OpenAI 发布 ChatGPT，五天用户破百万。大语言模型第一次以对话产品形态进入大众视野，AI 应用工程化时代由此开启。"},
+  {y:2022, m:"2022-12", term:"提示词工程", en:"Prompt Engineering", cat:"工程范式", status:"pending",
+   desc:"随着 ChatGPT 普及成为第一门显学：通过设计输入文本引导模型产出期望结果。后来被 Context Engineering 扩展为更系统的学科。"},
+
+  // ---- 2023 ----
+  {y:2023, m:"2023-03", term:"插件机制", en:"GPT-4 & Plugins", cat:"模型能力", status:"pending",
+   desc:"GPT-4 发布并引入插件机制，模型第一次被官方设计为可以调用外部工具与实时数据的平台。"},
+  {y:2023, m:"2023-04", term:"自主智能体", en:"Autonomous Agent（AutoGPT / BabyAGI）", cat:"智能体", status:"pending",
+   desc:"AutoGPT、BabyAGI 爆火，“给定目标、让 AI 自主拆解任务并循环执行”的概念走红，Agent 叙事正式登场。"},
+  {y:2023, m:"2023-06", term:"函数调用", en:"Function Calling", cat:"模型能力", status:"pending",
+   desc:"OpenAI 推出函数调用能力，LLM 与外部工具的连接从“解析文本”升级为结构化协议，成为 Tool Use 的事实起点。"},
+  {y:2023, m:"2023-08", term:"检索增强生成", en:"RAG（Retrieval-Augmented Generation）", cat:"架构模式", status:"handbook",
+   link:"rag.html",
+   desc:"概念源自 2020 年 Meta 论文，2023 年随企业落地 LLM 的需求翻红，成为“给模型外挂知识库”的标配架构。"},
+  {y:2023, m:"2023-09", term:"向量数据库", en:"Vector Database / Embedding", cat:"基础设施", status:"pending",
+   desc:"RAG 热潮带火检索基础设施：Embedding 模型与向量数据库（Pinecone、Milvus、pgvector 等）进入工程选型清单。"},
+  {y:2023, m:"2023-10", term:"多模态大模型", en:"Multimodal LLM（GPT-4V）", cat:"模型能力", status:"pending",
+   desc:"GPT-4V 开放视觉理解能力，LLM 从纯文本扩展到图像输入，多模态交互成为标配方向。"},
+  {y:2023, m:"2023-11", term:"GPTs / Assistants API", en:"GPTs & Assistants API", cat:"产品形态", status:"pending",
+   desc:"OpenAI 首届开发者大会发布 GPTs 与 Assistants API，自定义 Agent 走向配置化、平台化。"},
+
+  // ---- 2024 ----
+  {y:2024, m:"2024-02", term:"文生视频", en:"Text-to-Video（Sora）", cat:"模型能力", status:"pending",
+   desc:"OpenAI 演示 Sora，长镜头、一致性的视频生成效果引爆赛道，视频生成成为多模态竞争焦点。"},
+  {y:2024, m:"2024-02", term:"长上下文", en:"Long Context", cat:"模型能力", status:"pending",
+   desc:"Gemini 1.5 将上下文窗口推至百万 token 级，“RAG 还是长上下文”的路线之争由此展开。"},
+  {y:2024, m:"2024-03", term:"智能体工作流", en:"Agentic Workflow", cat:"智能体", status:"pending",
+   desc:"Andrew Ng 公开倡导 Agentic Workflow：通过反思、工具使用、规划与多智能体协作的迭代流程，让模型表现超越单轮生成。"},
+  {y:2024, m:"2024-07", term:"智能体化 RAG", en:"Agentic RAG", cat:"架构模式", status:"pending",
+   desc:"RAG 从“检索→拼接→生成”的固定流水线，演进为由 Agent 自主决定何时检索、检索什么、是否需要重写查询的动态架构。"},
+  {y:2024, m:"2024-09", term:"推理模型", en:"Reasoning Model（o1）/ Test-time Compute", cat:"模型能力", status:"pending",
+   desc:"OpenAI 发布 o1，通过强化学习让模型在推理时“思考更久”。扩展定律从训练时计算扩展到推理时计算。"},
+  {y:2024, m:"2024-10", term:"电脑操作智能体", en:"Computer Use", cat:"智能体", status:"pending",
+   desc:"Claude 3.5 Sonnet 支持直接观看屏幕并操作鼠标键盘，Agent 的能力边界从 API 扩展到图形界面。"},
+  {y:2024, m:"2024-11", term:"模型上下文协议", en:"MCP（Model Context Protocol）", cat:"协议标准", status:"pending",
+   desc:"Anthropic 发布开放协议 MCP，用统一标准连接 Agent 与工具、数据源，被称为“AI 时代的 USB-C 接口”，次年生态爆发。"},
+
+  // ---- 2025 ----
+  {y:2025, m:"2025-01", term:"开源推理模型", en:"DeepSeek-R1 / RLVR", cat:"模型能力", status:"pending",
+   desc:"DeepSeek-R1 以开源权重复现 o1 级推理能力，可验证奖励强化学习（RLVR）路线确立，推理能力迅速平权。"},
+  {y:2025, m:"2025-02", term:"氛围编程", en:"Vibe Coding", cat:"工程范式", status:"pending",
+   desc:"Karpathy 提出并命名：开发者用自然语言描述意图、接受 AI 生成的代码而不逐行审阅，引发关于软件工程未来的大讨论。"},
+  {y:2025, m:"2025-02", term:"深度研究", en:"Deep Research", cat:"产品形态", status:"pending",
+   desc:"OpenAI 发布 Deep Research：Agent 自主进行多轮检索、阅读与综合，产出带引用的长篇研究报告，成为各家跟进的标配产品形态。"},
+  {y:2025, m:"2025-02", term:"挽具工程", en:"Harness Engineering", cat:"工程范式", status:"pending",
+   desc:"Mitchell Hashimoto 命名：关注包裹模型的“挽具”（脚手架系统）——工具暴露、上下文管理、循环控制等模型之外的工程设计。"},
+  {y:2025, m:"2025-03", term:"通用智能体", en:"General Agent（Manus）", cat:"产品形态", status:"pending",
+   desc:"Manus 演示通用任务执行 Agent 引爆关注，“一个 Agent 完成任意任务”的产品形态成为追逐热点，MCP 生态同期爆发。"},
+  {y:2025, m:"2025-04", term:"智能体互联协议", en:"A2A（Agent2Agent）", cat:"协议标准", status:"pending",
+   desc:"Google 发布 Agent2Agent 协议，解决 Agent 与 Agent 之间发现、协作与任务委派的标准化问题，与 MCP 形成互补。"},
+  {y:2025, m:"2025-05", term:"智能体编程", en:"Agentic Coding", cat:"智能体", status:"pending",
+   desc:"Claude Code 等终端编码 Agent 普及，编程工作流从“补全与对话”重构为“委派任务、Agent 自主执行多步修改”。"},
+  {y:2025, m:"2025-06", term:"上下文工程", en:"Context Engineering", cat:"工程范式", status:"pending",
+   desc:"Tobi Lütke 与 Karpathy 等推动命名：为模型“在每个决策点提供恰当上下文”的系统工程，取代 Prompt Engineering 成为核心学科。"},
+  {y:2025, m:"2025-07", term:"子代理编排", en:"Sub-Agent / Multi-Agent Orchestration", cat:"智能体", status:"pending",
+   desc:"Claude Code subagents 等能力普及，主 Agent 将子任务委派给独立上下文的子代理执行，多智能体从研究概念进入日常工程实践。"},
+  {y:2025, m:"2025-09", term:"规格驱动开发", en:"Spec-Driven Development（Spec Kit）", cat:"工程范式", status:"pending",
+   desc:"GitHub 发布 Spec Kit：先与 AI 共建可执行的规格文档，再由规格生成计划与代码，回应 Vibe Coding 的失控问题。"},
+  {y:2025, m:"2025-10", term:"智能体技能", en:"Agent Skills", cat:"协议标准", status:"pending",
+   desc:"Anthropic 发布 Skills 开放标准：把领域知识与操作流程封装为可被 Agent 按需加载的技能包，Agent 能力走向模块化复用。"},
+
+  // ---- 2026 ----
+  {y:2026, m:"2026-03", term:"智能体环境工程", en:"Agentic Environment Engineering", cat:"工程范式", status:"handbook",
+   link:"agentic-environment-engineering.html",
+   desc:"关注 Agent 运行环境本身的工程设计：工具界面、沙箱、状态与反馈回路，让环境适配 Agent 而非让 Agent 迁就环境。（时间待一手来源核实）"},
+  {y:2026, m:"2026-05", term:"可执行本体", en:"Executable Ontology", cat:"工程范式", status:"handbook",
+   link:"executable-ontology.html",
+   desc:"把领域本体从“静态知识建模”升级为可被 Agent 直接执行与校验的运行时资产，连接知识工程与智能体工程。（时间待一手来源核实）"},
+  {y:2026, m:"2026-06", term:"循环工程", en:"Loop Engineering", cat:"工程范式", status:"handbook",
+   link:"loop-engineering.html",
+   desc:"正式命名。位于 Prompt → Context → Harness → Loop 链路最上层，回答“当模型会用工具、能读上下文之后，谁来按下‘下一步’按钮”。"}
+];
+
+/* ================= 渲染 ================= */
+const main = document.getElementById('main');
+const yearsNav = document.getElementById('years');
+const catsBox = document.getElementById('cats');
+const qInput = document.getElementById('q');
+let activeCat = null;
+
+const CATS = [...new Set(DATA.map(d=>d.cat))];
+const STATUS_LABEL = {handbook:'独立手册', pending:'待补齐'};
+const STATUS_DOT = {handbook:'g', pending:'gr'};
+
+// 类别 chips
+function renderCats(){
+  catsBox.innerHTML = '';
+  const all = document.createElement('span');
+  all.className = 'chip' + (activeCat===null?' on':'');
+  all.textContent = '全部';
+  all.onclick = ()=>{activeCat=null;renderCats();renderMain();};
+  catsBox.appendChild(all);
+  CATS.forEach(c=>{
+    const el = document.createElement('span');
+    el.className = 'chip' + (activeCat===c?' on':'');
+    el.textContent = c;
+    el.onclick = ()=>{activeCat=(activeCat===c?null:c);renderCats();renderMain();};
+    catsBox.appendChild(el);
+  });
+}
+
+// 年份导航
+function renderYears(){
+  const counts = {};
+  DATA.forEach(d=>counts[d.y]=(counts[d.y]||0)+1);
+  const years = [...new Set(DATA.map(d=>d.y))].sort();
+  yearsNav.innerHTML = years.map(y=>
+    `<a class="year-item" data-y="${y}" href="#y${y}">${y}<span class="cnt">${counts[y]}</span></a>`
+  ).join('');
+  yearsNav.querySelectorAll('.year-item').forEach(a=>{
+    a.addEventListener('click',()=>setActiveYear(a.dataset.y));
+  });
+}
+function setActiveYear(y){
+  yearsNav.querySelectorAll('.year-item').forEach(a=>a.classList.toggle('active',a.dataset.y==String(y)));
+}
+
+// 卡片
+function cardHTML(d){
+  const linked = d.status==='handbook' && d.link;
+  const badge = `<span class="status"><span class="dot ${STATUS_DOT[d.status]}"></span>${STATUS_LABEL[d.status]}</span>`;
+  const go = linked
+    ? `<span class="go">查看手册 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>`
+    : `<div class="pending-note">专属详情页待补齐 · 将按 handbook 结构编写</div>`;
+  return `<div class="entry st-${d.status}">
+    <a class="card ${linked?'':'no-link'}" ${linked?`href="${d.link}"${d.link.startsWith('http')?' target="_blank" rel="noopener"':''}`:`data-pending="1"`}>
+      <div class="card-top">
+        <span class="month">${d.m}</span>
+        <span class="term">${d.term}</span>
+        <span class="term-en">${d.en}</span>
+        <span class="badges"><span class="cat">${d.cat}</span>${badge}</span>
+      </div>
+      <div class="desc">${d.desc}</div>
+      ${go}
+    </a>
+  </div>`;
+}
+
+function renderMain(){
+  const q = qInput.value.trim().toLowerCase();
+  const filtered = DATA.filter(d=>{
+    if(activeCat && d.cat!==activeCat) return false;
+    if(q && !(d.term+d.en+d.desc+d.cat).toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const years = [...new Set(filtered.map(d=>d.y))].sort();
+  if(!years.length){
+    main.innerHTML = `<div class="empty">没有匹配的热词，试试调整搜索或筛选条件</div>`;
+    return;
+  }
+  main.innerHTML = years.map(y=>{
+    const items = filtered.filter(d=>d.y===y);
+    return `<section class="year-block" id="y${y}">
+      <div class="year-head"><h2>${y}</h2><span class="hline"></span><span class="yc">${items.length} 个热词</span></div>
+      <div class="entries">${items.map(cardHTML).join('')}</div>
+    </section>`;
+  }).join('');
+  bindPending();
+  observeYears();
+}
+
+// 待补齐点击提示
+const toast = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toast.classList.remove('show'),2200);
+}
+function bindPending(){
+  main.querySelectorAll('[data-pending]').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.preventDefault();
+      showToast('该热词的专属详情页尚未补齐，敬请期待');
+    });
+  });
+}
+
+// 滚动联动年份高亮
+let observer = null;
+function observeYears(){
+  if(observer) observer.disconnect();
+  observer = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting) setActiveYear(en.target.id.replace('y',''));
+    });
+  },{root:main,rootMargin:'-10% 0px -75% 0px'});
+  main.querySelectorAll('.year-block').forEach(s=>observer.observe(s));
+}
+
+qInput.addEventListener('input',renderMain);
+
+renderCats();
+renderYears();
+renderMain();
+setActiveYear(2022);
+</script>
+</body>
+</html>

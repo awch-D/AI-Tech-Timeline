@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>智能体环境工程手册｜Agentic Environment Engineering</title>
+<meta name="description" content="智能体环境工程中文手册：覆盖 Prompt、Context、Harness、Loop，以及环境建模、合成、质量评测、Agent–Environment 协同演化与生产运行时治理。">
+<meta name="keywords" content="Agentic Environment Engineering, 智能体环境工程, Environment Modeling, Environment Synthesis, Agent-Environment Co-evolution, Context Engineering, Harness Engineering, Loop Engineering, AI Agent">
+<meta name="author" content="Arno">
+<meta name="theme-color" content="#173b70">
+<meta property="og:type" content="article">
+<meta property="og:title" content="智能体环境工程手册">
+<meta property="og:description" content="从提示词到智能体环境：建模、合成、评测、协同演化与生产运行时的研究型中文手册。">
+<meta property="og:locale" content="zh_CN">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23173b70' d='M3 3h18v18H3z'/><path fill='%23f7f2e8' d='M6 7h12v2H6zm0 4h12v2H6zm0 4h7v2H6z'/></svg>">
+<style>
+:root{--paper:#f6f2e9;--paper-deep:#ebe4d6;--ink:#16233a;--muted:#657080;--line:#d5cdbd;--blue:#173b70;--blue-soft:#e6edf5;--red:#b74532;--red-soft:#f7e5df;--gold:#a27120;--green:#236b53;--white:#fffdf8;--serif:"Songti SC","STSong","Noto Serif CJK SC",serif;--sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;--mono:"SFMono-Regular",Consolas,monospace;--shadow:0 18px 50px rgba(30,42,58,.10)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.85 var(--sans);letter-spacing:.01em}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(90deg,rgba(22,35,58,.025) 1px,transparent 1px),linear-gradient(rgba(22,35,58,.02) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,black,transparent 78%)}
+a{color:var(--blue);text-underline-offset:3px;text-decoration-thickness:1px}.skip{position:absolute;left:-999px}.skip:focus{left:16px;top:12px;background:var(--ink);color:white;padding:8px 12px;z-index:9}.progress{position:fixed;z-index:10;inset:0 auto auto 0;height:4px;width:0;background:var(--red);transition:width .08s linear}.shell{display:grid;grid-template-columns:250px minmax(0,920px);gap:clamp(28px,5vw,76px);max-width:1280px;margin:auto;padding:32px clamp(18px,4vw,56px) 100px}.rail{position:sticky;top:28px;align-self:start;padding:8px 0 22px;border-top:4px solid var(--blue)}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);margin:15px 0 28px}.brand-mark{display:grid;place-items:center;width:34px;height:34px;background:var(--blue);color:var(--paper);font:700 15px var(--serif)}.brand b{display:block;font:700 15px/1.25 var(--serif)}.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}.toc{list-style:none;margin:0;padding:0;border-left:1px solid var(--line)}.toc a{display:block;padding:6px 0 6px 15px;border-left:2px solid transparent;margin-left:-1px;color:var(--muted);font-size:12px;text-decoration:none;transition:.18s}.toc a:hover,.toc a.active{border-left-color:var(--red);color:var(--ink)}.rail-note{margin:28px 0 0;padding:14px 0;border-top:1px solid var(--line);color:var(--muted);font:11px/1.65 var(--sans)}main{min-width:0}.hero{padding:clamp(42px,7vw,84px) 0 48px;border-bottom:1px solid var(--line);position:relative}.eyebrow{display:flex;gap:9px;align-items:center;color:var(--red);font:700 11px/1.2 var(--sans);letter-spacing:.16em;text-transform:uppercase}.eyebrow:before{content:"";display:block;width:26px;height:2px;background:currentColor}.hero h1{max-width:850px;margin:19px 0 17px;font:700 clamp(39px,6vw,72px)/1.08 var(--serif);letter-spacing:-.055em}.hero h1 em{color:var(--red);font-style:normal}.hero .lede{max-width:680px;margin:0;color:#3d4a5b;font:clamp(17px,2vw,20px)/1.75 var(--serif)}.hero-meta{display:flex;flex-wrap:wrap;gap:8px 19px;margin-top:28px;color:var(--muted);font-size:12px}.hero-meta span{display:inline-flex;align-items:center;gap:7px}.hero-meta i{width:6px;height:6px;border-radius:50%;background:var(--red)}section{padding:clamp(42px,6vw,74px) 0;border-bottom:1px solid var(--line);scroll-margin-top:16px}h2{display:flex;gap:15px;align-items:baseline;margin:0 0 12px;font:700 clamp(29px,4vw,43px)/1.2 var(--serif);letter-spacing:-.04em}h2 .index{color:var(--red);font:700 12px/1 var(--mono);letter-spacing:.06em}h3{margin:35px 0 10px;font:700 21px/1.35 var(--serif);letter-spacing:-.02em}p{margin:13px 0;color:#394656}.section-kicker{margin:0 0 27px;color:var(--muted);font-size:13px}.principle{margin:24px 0;padding:21px 25px;background:var(--blue);color:#f8f4ea;box-shadow:var(--shadow)}.principle small{display:block;margin-bottom:6px;color:#bdcde0;font:700 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase}.principle p{margin:0;color:inherit;font:500 19px/1.62 var(--serif)}.warning{margin:24px 0;padding:17px 20px;border-left:3px solid var(--gold);background:#fbf2dc;color:#664d1b;font-size:14px}.source-tag{display:inline-block;margin-left:5px;padding:1px 6px;background:var(--blue-soft);color:var(--blue);font:700 10px/1.6 var(--mono);letter-spacing:.02em;vertical-align:2px}.source-tag.emerging{background:var(--red-soft);color:var(--red)}.source-tag.practice{background:#e2efe9;color:var(--green)}.map{display:grid;grid-template-columns:118px 1fr;gap:0;border-top:1px solid var(--line);margin:26px 0}.map dt,.map dd{margin:0;padding:17px 0;border-bottom:1px solid var(--line)}.map dt{padding-right:15px;color:var(--blue);font:700 13px/1.5 var(--mono)}.map dd{color:#394656}.map dd b{color:var(--ink)}.timeline{margin:28px 0;border-left:1px solid var(--line)}.timeline-item{position:relative;padding:0 0 28px 26px}.timeline-item:before{content:"";position:absolute;left:-5px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--paper);border:2px solid var(--blue)}.timeline-item.is-now:before{background:var(--red);border-color:var(--red);box-shadow:0 0 0 5px var(--red-soft)}.timeline-item time{display:block;color:var(--red);font:700 11px/1 var(--mono);letter-spacing:.08em}.timeline-item b{display:block;margin:6px 0 2px;font:700 18px/1.35 var(--serif)}.timeline-item p{margin:0;font-size:14px}.comparison{width:100%;border-collapse:collapse;margin:25px 0;font-size:13px}.comparison th,.comparison td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}.comparison th{color:var(--muted);font:700 11px/1.4 var(--sans);letter-spacing:.08em;text-transform:uppercase}.comparison td:first-child{color:var(--blue);font-weight:700;white-space:nowrap}.comparison tr:last-child td{border-bottom:0}.matrix{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin:25px 0}.matrix article{padding:20px;background:var(--white)}.matrix h4{margin:0 0 8px;font:700 18px/1.3 var(--serif)}.matrix p{margin:0;font-size:13px}.flow{overflow:auto;margin:25px 0;padding:21px 24px;background:#18273b;color:#dbe6ef;font:12px/1.75 var(--mono);white-space:pre;box-shadow:var(--shadow)}.checklist{list-style:none;margin:20px 0;padding:0}.checklist li{position:relative;padding:13px 0 13px 30px;border-bottom:1px solid var(--line);font-size:14px;color:#394656}.checklist li:before{content:"";position:absolute;left:0;top:20px;width:13px;height:13px;border:1px solid var(--red);background:var(--paper)}.quote{margin:29px 0;padding:10px 0 10px 23px;border-left:2px solid var(--red);color:#37475d;font:500 21px/1.65 var(--serif)}.quote cite{display:block;margin-top:9px;color:var(--muted);font:12px/1.5 var(--sans);font-style:normal}.references{counter-reset:ref;list-style:none;padding:0;margin:26px 0}.references li{counter-increment:ref;position:relative;padding:15px 0 15px 41px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}.references li:before{content:"[" counter(ref,decimal-leading-zero) "]";position:absolute;left:0;top:15px;color:var(--red);font:700 11px var(--mono)}.references b{display:block;color:var(--ink);font-weight:600}.references a{word-break:break-word}.footer{padding:38px 0 0;color:var(--muted);font-size:12px}.footer b{color:var(--ink)}
+@media(max-width:900px){body{overflow-x:hidden}.shell{grid-template-columns:minmax(0,1fr);width:100%;max-width:100%;padding:18px 20px 72px;overflow-x:hidden}.rail{position:static;display:block;min-width:0;padding-bottom:0}.brand{margin:14px 0}.toc{display:none}.rail-note{margin:18px 0 0;border-top:1px solid var(--line);border-left:0;padding:14px 0 0;white-space:normal;overflow-wrap:anywhere}main,section{width:100%;max-width:100%;min-width:0}.hero{padding-top:44px}.matrix{grid-template-columns:1fr}.comparison{min-width:650px}.table-scroll{max-width:100%;overflow:auto}.hero h1{font-size:clamp(38px,12vw,52px);letter-spacing:-.06em}}
+@media print{body{background:white;font-size:12px}.progress,.rail{display:none}.shell{display:block;max-width:none;padding:0}.hero,section{break-inside:avoid}.hero{padding-top:0}.flow{background:#f2f2f2;color:#111;box-shadow:none}.matrix{background:#ddd}.matrix article{background:white}a{color:#111}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<a class="skip" href="#manual">跳到正文</a>
+<div class="shell">
+<aside class="rail" aria-label="手册目录">
+  <a class="brand" href="#top"><span class="brand-mark">Æ</span><span><b>环境工程<br>研究手册</b><small>Agentic Environments</small></span></a>
+  <nav><ol class="toc" id="toc">
+    <li><a class="active" href="#intro">导读</a></li><li><a href="#map">概念地图</a></li><li><a href="#layers">六层演进</a></li><li><a href="#modeling">环境建模</a></li><li><a href="#synthesis">环境合成</a></li><li><a href="#environment-evaluation">环境评测</a></li><li><a href="#coevolution">协同演化</a></li><li><a href="#primitives">环境原语</a></li><li><a href="#runtime">运行时设计</a></li><li><a href="#loop">环境闭环</a></li><li><a href="#governance">控制与安全</a></li><li><a href="#evals">运行评估</a></li><li><a href="#adoption">落地路线</a></li><li><a href="#misconceptions">边界与误解</a></li><li><a href="#sources">权威资料</a></li>
+  </ol></nav>
+  <p class="rail-note">研究型导读，不把流行词当作行业标准。每个新术语均标注其证据等级与适用边界。</p>
+</aside>
+<main id="manual">
+<header class="hero" id="top">
+  <div class="eyebrow">Field Manual · July 2026</div>
+  <h1>从提示词到<br><em>智能体环境工程</em></h1>
+  <p class="lede">当模型能推理、调用工具并长时间执行时，工程瓶颈不再只是“该说什么”，而是：它在什么环境中观察、行动、验证、恢复与被治理。</p>
+  <div class="hero-meta"><span><i></i>中文研究手册</span><span><i></i>单文件 · 零依赖</span><span><i></i>概念与实践分层</span><span><i></i>更新至 2026 年 7 月</span></div>
+</header>
+
+<section id="intro">
+  <h2><span class="index">01</span>导读：工程对象正在外移</h2>
+  <p class="section-kicker">从“模型回答得好不好”，转向“模型在一套什么样的系统中工作”。</p>
+  <div class="principle"><small>Working Definition</small><p><b>智能体环境工程（Agentic Environment Engineering）</b>是对 Agent 工作环境的建模、合成、评估、应用与演化进行系统设计；在生产语境中，它进一步落到资源、接口、状态、隔离、反馈、预算和人机协同。</p></div>
+  <p>精确术语已出现在 2026 年中国科学院团队的综述预印本；相邻的 <b>Agent Environment Engineering</b> 也出现在清华大学计算机科学与技术系、智谱 AI 团队的 EurekAgent 论文与开源实现中。它们证明该概念已经进入研究讨论，但<strong>尚不是经过同行评审或由行业共同采用的标准</strong>。本文把它作为工作性总称，同时明确标注证据边界。<span class="source-tag emerging">S12–S14</span></p>
+  <p>一个实用判断是：若仅换模型或改提示词无法解决问题，而重新设计可见信息、工具契约、状态恢复、验证方式、预算或权限边界能够解决，那么瓶颈已经从模型调用转移到环境。<span class="source-tag">S01–S03</span><span class="source-tag">S08–S10</span></p>
+  <div class="warning"><b>阅读边界：</b>Prompt → Context → Harness → Loop → Environment 是教学性的“控制面外扩图”，不是业界共同确认、依次替代的五代历史。各层长期共存，Prompt 并未过时。</div>
+  <div class="quote">“环境”不是提示词的背景板；它是智能体可以感知、调用、改变并被约束的工作面。<cite>— 综合研究综述、官方工程文章与运行时实践</cite></div>
+</section>
+
+<section id="map">
+  <h2><span class="index">02</span>概念地图：五个问题，五层工程</h2>
+  <p class="section-kicker">它们是控制面的逐层扩展，不是新词替换旧词。</p>
+  <dl class="map">
+    <dt>PROMPT</dt><dd><b>提示工程 · Prompt Engineering</b>：怎样编写、组织指令以获得目标行为？关注<strong>指令本身</strong>。<span class="source-tag">S07</span></dd>
+    <dt>CONTEXT</dt><dd><b>上下文工程 · Context Engineering</b>：推理时应策展并维护哪些 token，包括系统指令、工具、外部数据与历史？关注<strong>最小高信号信息集</strong>。<span class="source-tag">S02</span></dd>
+    <dt>HARNESS</dt><dd><b>Harness Engineering · 中文译名未定</b>：围绕模型建立 instructions、tools、routing、output requirements 与 validation checks 构成的完整契约。关注<strong>可执行、可验证的 Agent 外壳</strong>；已有官方实作，但术语边界仍宽。<span class="source-tag">S09–S11</span></dd>
+    <dt>LOOP</dt><dd><b>Agent Loop / Loop Engineering</b>：官方机制是“推理 → 工具调用 → 结果追加上下文 → 再推理”直到最终消息；Loop Engineering 则是更上层的早期个人框架，强调发现、分派、检查、记录和继续。<span class="source-tag">S08</span><span class="source-tag emerging">S17–S18</span></dd>
+    <dt>ENVIRONMENT</dt><dd><b>智能体环境工程 · Agentic Environment Engineering</b>：对资源、约束、接口及环境生命周期进行系统工程，让 Agent 能被训练、评测或在生产中长期工作。<span class="source-tag emerging">新兴研究术语 · S12–S14</span></dd>
+  </dl>
+  <p><strong>“环境”至少有两种相邻但不可混同的含义：</strong>生产运行环境强调工具、文件系统、权限、Git、工件、预算、评估与人工控制；训练/评测环境还包括可合成、可交互的模拟世界。本文以生产运行环境为主，并在涉及 world model 时单独说明。<span class="source-tag">S09</span><span class="source-tag">S12–S16</span></p>
+</section>
+
+<section id="layers">
+  <h2><span class="index">03</span>六层演进：从单次回答到可治理环境</h2>
+  <p class="section-kicker">关键节点不是线性替代，而是将新的控制面叠加在已有能力上。</p>
+  <div class="timeline">
+    <article class="timeline-item"><time>2022</time><b>Reasoning + Acting</b><p>ReAct 将推理、行动与环境观察交替组织，奠定基于外部反馈推进任务的基础形态。<span class="source-tag">S05</span></p></article>
+    <article class="timeline-item"><time>2023</time><b>规划、记忆与工具使用</b><p>自主 Agent 综述把长期任务拆为规划、记忆和工具使用，也系统呈现有限上下文与长期规划等瓶颈。<span class="source-tag">S06</span></p></article>
+    <article class="timeline-item"><time>2024</time><b>Workflow、Agent 与开放连接</b><p>Anthropic 区分预定路径 workflow 与由模型动态决策的 agent；MCP 将 resources、prompts 与 tools 的接入标准化。<span class="source-tag">S01</span><span class="source-tag">S04</span></p></article>
+    <article class="timeline-item"><time>2025</time><b>Context 成为有限资源</b><p>上下文工程从“写提示词”外扩为选择、压缩、即时检索与维护完整上下文状态。<span class="source-tag">S02</span></p></article>
+    <article class="timeline-item"><time>2026.01–05</time><b>Harness 与 Agent Loop 被显式工程化</b><p>OpenAI 分别公开 Codex agent loop、agent-first 仓库 harness 和由 traces / evals 驱动的改进闭环。<span class="source-tag">S08–S10</span></p></article>
+    <article class="timeline-item is-now"><time>2026.06</time><b>Agentic Environment Engineering 进入研究议程</b><p>中科院综述、EurekAgent 论文与实现开始直接把“环境本身”作为建模、合成、评测、权限、工件、预算和人机协同的工程对象。<span class="source-tag emerging">S12–S14</span></p></article>
+  </div>
+</section>
+
+<section id="modeling">
+  <h2><span class="index">04</span>环境建模：定义 Agent 所处的世界</h2>
+  <p class="section-kicker">先说明 Agent 能看见什么、能做什么、世界如何变化和怎样反馈，再讨论工具与工作流。</p>
+  <div class="principle"><small>Formal Model</small><p>综述将环境建模为 POMDP：<b>状态空间 S、行动空间 A、状态转移 P、奖励 R、观察空间 Ω、观察函数 O 与折扣因子 γ</b>。LLM Agent 根据多轮交互历史选择行动，环境返回新的观察和反馈。<span class="source-tag emerging">S12</span></p></div>
+  <h3>八个属性轴</h3>
+  <p>它们不是八种互斥环境，而是描述同一环境的八组坐标：</p>
+  <div class="matrix">
+    <article><h4>Symbolic ↔ Neural</h4><p>状态转移来自显式规则或可执行代码，还是由神经网络世界模型近似。</p></article>
+    <article><h4>Open-loop ↔ Closed-loop</h4><p>Agent 按初始计划执行，还是根据每一步新观察持续调整行动。</p></article>
+    <article><h4>Online ↔ Offline</h4><p>与真实系统实时交互，还是只使用静态轨迹数据进行学习与比较。</p></article>
+    <article><h4>MDP ↔ POMDP</h4><p>Agent 能否访问完整真实状态，还是必须从不完整观察推断隐藏状态。</p></article>
+    <article><h4>Deterministic ↔ Nondeterministic</h4><p>相同状态与行动是否产生唯一结果，还是存在随机状态转移。</p></article>
+    <article><h4>Discrete ↔ Continuous</h4><p>行动来自有限可数集合，还是连续的实数向量空间。</p></article>
+    <article><h4>Unimodal ↔ Multimodal</h4><p>观察只包含单一模态，还是整合文字、图像、视频与其他传感信息。</p></article>
+    <article><h4>Single-agent ↔ Multi-agent</h4><p>环境转移由一个决策主体决定，还是取决于多个 Agent 的联合行动。</p></article>
+  </div>
+  <h3>八个环境领域</h3>
+  <div class="table-scroll"><table class="comparison"><thead><tr><th>领域</th><th>典型交互面</th><th>代表任务</th></tr></thead><tbody>
+    <tr><td>GUI</td><td>桌面、移动端、Web 界面</td><td>导航、表单、跨应用操作</td></tr>
+    <tr><td>Deep Research</td><td>搜索引擎、文档与多来源证据</td><td>信息检索、多源推理、研究报告</td></tr>
+    <tr><td>Embodied</td><td>机器人或 3D 虚拟世界</td><td>空间导航、物理操作、长程规划</td></tr>
+    <tr><td>Game</td><td>规则化开放世界与博弈系统</td><td>解谜、社会推理、策略管理</td></tr>
+    <tr><td>Tool</td><td>函数、API、数据库与 MCP</td><td>工具选择、参数构造、结果反馈</td></tr>
+    <tr><td>Code</td><td>代码、仓库、编译器和测试器</td><td>生成、理解、验证、调试</td></tr>
+    <tr><td>Domain-specific</td><td>医疗、科研、金融等专业系统</td><td>领域决策与专门评测</td></tr>
+    <tr><td>Cross-domain</td><td>跨异构任务和多种交互面</td><td>通用性与迁移能力评估</td></tr>
+  </tbody></table></div>
+  <div class="warning"><b>建模边界：</b>工具清单只是行动空间的一部分。完整环境模型还必须描述状态、转移、观察、反馈、可见性和多主体关系。</div>
+</section>
+
+<section id="synthesis">
+  <h2><span class="index">05</span>环境合成：从手工场景到规模化生成</h2>
+  <p class="section-kicker">环境合成解决的不是“生成更多题目”，而是怎样构造可交互、可验证、可扩展的状态转移系统。</p>
+  <h3>Symbolic Synthesis · 符号合成</h3>
+  <p>用显式规则、可执行代码或形式化逻辑构建环境，优势是可解释、可复现和易验证。综述归纳为三条路径：<span class="source-tag emerging">S12</span></p>
+  <div class="matrix">
+    <article><h4>Task-driven</h4><p>把数学、代码等高质量静态任务封装为可交互环境，复用既有数据和验证器。</p></article>
+    <article><h4>Real-world-driven</h4><p>将 Web、GUI、游戏等真实交互介质投影为可控虚拟环境，降低真实系统运行成本。</p></article>
+    <article><h4>De novo</h4><p>从少量种子甚至零样本直接生成全新环境，扩展自由度最高，但最依赖逻辑一致性和自动验证。</p></article>
+  </div>
+  <h3>Neural Synthesis · 神经合成</h3>
+  <p>用神经网络近似环境状态转移与观察生成，适合构造高维、开放和多模态世界：</p>
+  <div class="matrix">
+    <article><h4>Pixel-level</h4><p>直接生成图像或视频观察，物理细节丰富，但长程一致性和计算成本是主要难点。</p></article>
+    <article><h4>Word-level</h4><p>以自然语言表达状态与变化，抽象程度高、成本较低，需控制幻觉和前后矛盾。</p></article>
+    <article><h4>Latent-level</h4><p>在学习到的表征空间中模拟语义与动力学，以效率换取可解释性和完整细节。</p></article>
+  </div>
+  <div class="principle"><small>Design Trade-off</small><p><b>符号环境提供可靠性，神经环境提供生成规模。</b>未来方向不是二选一，而是让显式约束与可学习世界模型形成 Neural–Symbolic Environment。<span class="source-tag emerging">S12</span><span class="source-tag">S16</span></p></div>
+</section>
+
+<section id="environment-evaluation">
+  <h2><span class="index">06</span>环境评测：先证明世界可信，再测 Agent 能力</h2>
+  <p class="section-kicker">Agent 得分很高，不代表环境正确；弱验证器、任务泄漏或失真动力学都可能制造虚假能力。</p>
+  <div class="matrix">
+    <article><h4>Correctness · 正确性</h4><p>状态转移是否合法、任务是否可解、验证器是否可靠。常用程序执行、单元测试、可解性检查和轨迹验证。</p></article>
+    <article><h4>Diversity · 多样性</h4><p>任务、状态、工具和语言空间是否覆盖广泛且不重复，避免 Agent 只记住少量模式。</p></article>
+    <article><h4>Complexity · 复杂度</h4><p>难度是否既非过易也非不可完成，可用步骤数、工具数、代码量或人类/强模型表现校准。</p></article>
+    <article><h4>Fidelity · 保真度</h4><p>合成环境是否忠实反映真实系统、物理动力学或用户行为；神经环境还需评估感知与交互一致性。</p></article>
+  </div>
+  <div class="table-scroll"><table class="comparison"><thead><tr><th>对象</th><th>重点证据</th><th>典型风险</th></tr></thead><tbody>
+    <tr><td>符号环境</td><td>可执行性、规则一致、可解性、验证器正确</td><td>规则漏洞、测试泄漏、奖励投机</td></tr>
+    <tr><td>神经环境</td><td>语义一致、交互一致、动态演化和物理真实性</td><td>长程漂移、不可控生成、观察失真</td></tr>
+  </tbody></table></div>
+  <div class="warning"><b>不要混淆两类评估：</b>这里评的是“环境是否可信”；后文运行评估关注“Agent 在既定环境中是否完成任务、轨迹是否合规”。两者必须同时成立。<span class="source-tag emerging">S12</span></div>
+</section>
+
+<section id="coevolution">
+  <h2><span class="index">07</span>协同演化：Agent 与环境相互抬高上限</h2>
+  <p class="section-kicker">环境不只是固定考场；它可以积累经验、调整工作流、生成训练轨迹并持续改变难度。</p>
+  <h3>Agent Evolution · 四条能力演化路径</h3>
+  <div class="matrix">
+    <article><h4>Memory-centric</h4><p>从实例轨迹、抽象脚本到结构化技能，将交互经验沉淀为可检索、可调用的能力资产。</p></article>
+    <article><h4>Orchestration-centric</h4><p>从固定工作流到自动编排，再到可持续演化的工作流结构。</p></article>
+    <article><h4>Trajectory-centric Offline</h4><p>通过任务合成、轨迹合成与轨迹精炼，生成可用于模仿学习和离线优化的数据。</p></article>
+    <article><h4>Exploration-centric Online</h4><p>利用在线探索、奖励塑形和算法优化，让 Agent 根据实时环境反馈更新策略。</p></article>
+  </div>
+  <h3>Environment Evolution · 三条环境演化路径</h3>
+  <div class="table-scroll"><table class="comparison"><thead><tr><th>路径</th><th>演化机制</th><th>主要目标</th></tr></thead><tbody>
+    <tr><td>Neural-driven</td><td>Self-play 或 world model 学习环境参数与未来状态</td><td>生成更丰富、更适应 Agent 的交互场景</td></tr>
+    <tr><td>Difficulty-driven</td><td>显式课程或根据实时表现隐式调节难度</td><td>让任务保持在可学习但具有挑战的区间</td></tr>
+    <tr><td>Scaling-driven</td><td>扩大既有场景多样性，或引入全新结构与模态</td><td>推动跨场景泛化和更通用的能力</td></tr>
+  </tbody></table></div>
+  <div class="flow">  Environment Eₜ ──任务 / 观察 / 奖励──► Agent πₜ
+        ▲                                  │
+        │                                  ▼
+  环境生成 / 难度 / 扩展 ◄──轨迹 / 技能 / 策略── Agent πₜ₊₁</div>
+  <p>真正的共演化必须保留外部验证：环境不能只迎合当前 Agent，Agent 也不能通过修改奖励或验证器伪造进步。<span class="source-tag emerging">S12</span></p>
+</section>
+
+<section id="primitives">
+  <h2><span class="index">08</span>环境原语：Agent 依赖的七类条件</h2>
+  <p class="section-kicker">不是“给模型更多工具”，而是设计每一次行动都能被理解、限制和复现的工作面。</p>
+  <div class="flow">  任务 / 事件
+      │
+      ▼
+  ┌─────────── Environment Contract ────────────┐
+  │  Context · State · Tools · Sandbox · Policy  │
+  │  Evidence · Evaluation · Human Escalation    │
+  └────────────────────┬────────────────────────┘
+                       ▼
+                 Agent Runtime
+                       │
+                       ▼
+              Observable World Change</div>
+  <div class="matrix">
+    <article><h4>01 · 任务事实</h4><p>当前目标、约束、输入来源和成功标准。没有可判定目标的自主循环只会把不确定性放大。</p></article>
+    <article><h4>02 · 上下文装配</h4><p>按任务阶段动态挑选文件、记忆、检索证据与最近观察；不是把所有历史消息机械塞进窗口。<span class="source-tag">S02</span></p></article>
+    <article><h4>03 · 状态与恢复</h4><p>把可继续执行的信息放到模型窗口之外：检查点、执行游标、工件引用、失败原因和待人工决定项。</p></article>
+    <article><h4>04 · 工具契约</h4><p>每个工具都有明确的输入、输出、权限、幂等性、超时、成本与可观察结果；工具是环境 API，不是提示词附注。<span class="source-tag">S04</span></p></article>
+    <article><h4>05 · 执行隔离</h4><p>将文件系统、网络、密钥、生产操作和并发任务限定在合适的沙箱、工作区或审批边界内。</p></article>
+    <article><h4>06 · 证据与评估</h4><p>用测试、结构化校验、外部观测或独立评审判断行动结果；不要把“模型说完成了”视为证据。<span class="source-tag">S03</span></p></article>
+    <article><h4>07 · 治理与接管</h4><p>定义预算、停止条件、风险动作的批准人、撤销路径和升级机制，让人类进入必要的决策点而不是每一步。</p></article>
+    <article><h4>贯穿原则 · 可追溯</h4><p>任何重要输出都应回溯到输入、工具调用、环境快照、验证结果与授权记录，才能调试、审计和改进。</p></article>
+  </div>
+  <h3>工具契约比工具数量更重要</h3>
+  <p>在 demo 中，工具只是函数列表；在生产环境中，工具是具备副作用的能力接口。优先补齐<strong>模式校验、最小权限、超时、重试语义、关联 ID、结果出处和审计事件</strong>，再讨论让 Agent 调更多工具。MCP 等开放协议能降低接入摩擦，但协议本身并不替代业务权限设计。<span class="source-tag">S04</span></p>
+</section>
+
+<section id="runtime">
+  <h2><span class="index">09</span>运行时设计：把“对话”变成可恢复的任务</h2>
+  <p class="section-kicker">长程 Agent 的最小单位不是聊天会话，而是带状态、预算和证据的任务执行。</p>
+  <p>一次真实任务至少经历：接收事件、确认目标、装配上下文、选择或调用能力、写入状态、验证结果、决定继续或退出。运行时的职责是让这条链路在超时、模型切换、工具失败和人工接管后仍能保持一致。</p>
+  <div class="table-scroll"><table class="comparison"><thead><tr><th>状态层</th><th>应该保存什么</th><th>不应该保存什么</th><th>典型载体</th></tr></thead><tbody>
+    <tr><td>Working</td><td>当前子目标、步骤游标、临时工具结果</td><td>所有历史原文</td><td>短期任务对象 / checkpoint</td></tr>
+    <tr><td>Durable</td><td>已确认事实、工件版本、待办和恢复指针</td><td>未核验的模型猜测</td><td>数据库 / 状态文件 / issue</td></tr>
+    <tr><td>Evidence</td><td>测试输出、diff、外部观测、审批记录</td><td>只有“成功”布尔值的摘要</td><td>trace、日志、制品库</td></tr>
+  </tbody></table></div>
+  <div class="principle"><small>Design Rule</small><p><b>状态不是聊天记录。</b>聊天记录服务于对话连续性；任务状态服务于可恢复性、并发控制和可信交接。两者可以相互引用，但不应互相替代。</p></div>
+  <p>这也是 Context Engineering 与 Environment Engineering 的分界之一：前者解决“下一次调用给模型什么信息”，后者还必须解决“该信息从何而来、是否可信、谁能改、失败后如何恢复”。</p>
+</section>
+
+<section id="loop">
+  <h2><span class="index">10</span>环境闭环：让行动受证据约束</h2>
+  <p class="section-kicker">Loop 不是 <code>while true</code>；它是一组带预算、观测、验证与退出条件的控制结构。</p>
+  <div class="flow">  [Intent] → [Plan] → [Act] → [Observe] → [Assess]
+                   ▲                          │          │
+                   │                          ▼          ├── pass → commit / report
+                   └──── feedback + state ← [Evidence]  ├── fail → revise / retry
+                                                        └── uncertain → human review</div>
+  <p>最小循环的价值在于让模型的行为与<strong>环境反馈</strong>耦合：工具返回的客观数据、测试输出、外部系统状态或用户批准，比模型对自己的叙述更可信。复杂流程可以嵌套多个循环，但每一层都应有独立的资源上限和退出理由。<span class="source-tag">S01</span></p>
+  <h3>四种常用控制模式</h3>
+  <div class="table-scroll"><table class="comparison"><thead><tr><th>模式</th><th>适合什么</th><th>关键设计点</th></tr></thead><tbody>
+    <tr><td>Workflow</td><td>步骤与规则稳定的流程</td><td>把路径写死；模型只处理不确定的小块。</td></tr>
+    <tr><td>Agent Loop</td><td>需要基于观察动态选工具的任务</td><td>限制步数、工具范围、预算和可行动作。</td></tr>
+    <tr><td>Evaluator–Optimizer</td><td>可生成候选、可定义质量标准的工作</td><td>让评估基于 rubric、测试或外部事实，而不只靠同一模型的自评。</td></tr>
+    <tr><td>Event-driven</td><td>由工单、代码变更、消息或数据到达触发</td><td>事件应幂等、可重放；状态和去重键必须在模型外保存。</td></tr>
+  </tbody></table></div>
+  <h3>“Maker / Checker”应被理解为证据分离</h3>
+  <p>常见的说法是“生成者不能给自己验收”。更精确的工程表述是：<strong>产生行动的通道不应独占成功判定</strong>。Checker 可以是单元测试、schema 校验、独立模型、人工审核或外部系统回执；是否需要不同模型，取决于风险和可用的客观证据。<span class="source-tag">S01</span><span class="source-tag">S03</span></p>
+  <ul class="checklist"><li>成功：满足可观察的完成标准，写入工件与证据。</li><li>可重试：收到具体失败原因，且下一次尝试有新的信息或策略。</li><li>需升级：连续无进展、权限不足、目标歧义或高影响操作。</li><li>强制停止：预算耗尽、超过时间窗口、检测到风险或用户撤销。</li></ul>
+</section>
+
+<section id="governance">
+  <h2><span class="index">11</span>控制与安全：把权限做成环境属性</h2>
+  <p class="section-kicker">模型能力越强，越不能把“请小心”当成安全机制。</p>
+  <p>环境工程的安全目标不是保证模型永不犯错，而是让错误<strong>难以越权、容易发现、能够撤销</strong>。因此，权限应绑定到任务、工作区、身份、时效和工具，而不是只埋在系统提示词中。</p>
+  <div class="matrix">
+    <article><h4>只读与低影响</h4><p>允许自动检索、分析、草拟与本地模拟；记录数据来源和访问范围。</p></article>
+    <article><h4>可逆写入</h4><p>允许在隔离分支、草稿箱或临时环境修改；要求 diff、检查点和明确回滚路径。</p></article>
+    <article><h4>高影响动作</h4><p>如提交生产变更、对外发送、删除或资金相关操作，应要求明确的人类审批与最小范围执行。</p></article>
+    <article><h4>禁止自动化</h4><p>高风险且不可逆、缺乏充分证据或授权不清的操作，不应交给无人值守 Agent。</p></article>
+  </div>
+  <h3>把外部内容视作不可信数据</h3>
+  <p>网页、邮件、文档和工具返回值可能携带与用户目标无关的操控性文本。环境应在数据层区分“待处理内容”和“可执行指令”，限制工具调用的能力范围、要求敏感动作出示证据，并记录 Agent 为什么采取某一步。这种分层比单纯要求模型“忽略恶意提示”更可靠。<span class="source-tag practice">防御原则</span></p>
+  <div class="warning"><b>安全边界：</b>沙箱、最小权限和审批并不是可选的“企业功能”。只要 Agent 拥有写入、联网、访问机密或代表用户行动的能力，它们就是环境设计的核心组成。</div>
+</section>
+
+<section id="evals">
+  <h2><span class="index">12</span>运行评估与观测：没有测量，就没有可靠改进</h2>
+  <p class="section-kicker">把一次 Agent 任务当作可检查的“episode”，而不是不可解释的一段聊天。</p>
+  <p>评估不是上线前的一次考试。长程 Agent 需要三层反馈：<strong>离线任务集</strong>验证版本是否退化，<strong>在线 trace</strong>发现真实失败模式，<strong>结果回流</strong>将错误归因到模型、上下文、工具、策略、权限还是环境状态。<span class="source-tag">S03</span></p>
+  <div class="table-scroll"><table class="comparison"><thead><tr><th>层级</th><th>要回答的问题</th><th>可用证据</th></tr></thead><tbody>
+    <tr><td>Outcome</td><td>任务结果真的满足用户目标吗？</td><td>测试、业务指标、人工验收、外部系统回执</td></tr>
+    <tr><td>Trajectory</td><td>过程是否高效、合规且没有走偏？</td><td>trace、工具调用序列、预算、策略事件</td></tr>
+    <tr><td>Environment</td><td>失败是否由工具契约、上下文供给或运行时造成？</td><td>环境快照、版本、权限决策、状态转移</td></tr>
+  </tbody></table></div>
+  <p><strong>LLM-as-a-judge 可以是有效工具，但不是免检的真相机。</strong>为它提供明确 rubric、用人工标注样本做校准、避免让它审自己参与生成的内容，并保留可解释的硬指标。可测任务优先使用确定性检查；主观任务再用组合式评审。<span class="source-tag">S03</span></p>
+</section>
+
+<section id="adoption">
+  <h2><span class="index">13</span>落地路线：先造可信闭环，再延长自主性</h2>
+  <p class="section-kicker">不要从“全自动 Agent”开始；从一个有真实结果、低风险且可自动验证的任务开始。</p>
+  <ol class="references" style="counter-reset:step"><li style="counter-increment:step"><b>选定一个窄任务</b>目标明确、输入边界清楚、结果可以被测试或人工快速判断。例如：整理结构化数据、生成草稿、修复低风险缺陷、检查配置偏差。</li><li style="counter-increment:step"><b>先写环境契约</b>明确哪些数据可信、可调的工具有哪些、每个动作的权限、成功证据、失败后的状态与升级人。</li><li style="counter-increment:step"><b>把状态和证据移出聊天</b>建立任务 ID、工件位置、检查点和 trace；确保中断后可以解释和恢复，而不是重新问模型“刚才做到哪了”。</li><li style="counter-increment:step"><b>设置硬护栏</b>为调用次数、token、时长、网络范围、写入范围和并发数设预算；高影响动作默认要求审批。</li><li style="counter-increment:step"><b>建立最小评估集</b>收集真实任务、失败案例和边界输入；每次变更模型、上下文、工具或策略后都回归测试。</li><li style="counter-increment:step"><b>再扩展自主性</b>只有在错误可定位、过程可观察、失败可恢复时，才逐步加入重试、多 Agent、事件触发和更长的运行周期。</li></ol>
+  <div class="principle"><small>Adoption Heuristic</small><p><b>自治等级应由可验证性决定，而不是由模型演示效果决定。</b>越难独立判定“做对了没有”，越应缩小 Agent 的权限和行动跨度。</p></div>
+</section>
+
+<section id="misconceptions">
+  <h2><span class="index">14</span>边界与误解：别让新名词掩盖旧问题</h2>
+  <p class="section-kicker">以下说法看似合理，实际会让团队跳过最重要的工程工作。</p>
+  <ul class="checklist">
+    <li><b>“环境工程就是接一个 RAG。”</b>检索只是上下文供给的一种方式；状态、工具、隔离、评估和治理同样属于环境。</li>
+    <li><b>“上下文越多，Agent 越聪明。”</b>上下文有成本、时效和噪声。正确目标是每个决策时刻拥有足够且可信的信息，而不是最大化 token 占用。</li>
+    <li><b>“多 Agent 天然更可靠。”</b>更多 Agent 也意味着更多状态同步、成本、权限面和失败模式。只有当分工和独立证据确实带来价值时才并行化。</li>
+    <li><b>“沙箱解决了所有安全问题。”</b>沙箱能限制执行面，但不能替代数据最小化、身份授权、审批、审计、工具输入校验和业务规则。</li>
+    <li><b>“让模型自评即可完成闭环。”</b>自评可提供信号，却不等同于外部证据。优先把成功判定落在测试、约束、系统回执或独立审核上。</li>
+    <li><b>“智能体环境工程已经是统一标准。”</b>不是。本文用它组织跨领域实践；发布和决策时应回到具体的协议、产品文档、论文和风险模型。</li>
+  </ul>
+</section>
+
+<section id="sources">
+  <h2><span class="index">15</span>权威资料：事实来源与证据等级</h2>
+  <p class="section-kicker">优先列官方工程文章、原始论文和开放规范；团队案例、预印本与个人观点均明确标注边界。</p>
+  <h3>官方工程定义与实践</h3>
+  <ol class="references">
+    <li><b>S01 · Anthropic — Building Effective Agents <span class="source-tag">官方 · 高</span></b>workflow / agent 的区分、五种组合模式、环境反馈与“从最简单方案开始”。<br><a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank" rel="noopener noreferrer">anthropic.com/engineering/building-effective-agents</a></li>
+    <li><b>S02 · Anthropic — Effective Context Engineering for AI Agents <span class="source-tag">官方 · 高</span></b>将 context engineering 定义为推理期间对最优 token 集的策展与维护，覆盖即时检索、压缩、结构化笔记和多 Agent 隔离。<br><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents" target="_blank" rel="noopener noreferrer">anthropic.com/engineering/effective-context-engineering-for-ai-agents</a></li>
+    <li><b>S03 · Anthropic — Demystifying Evals for AI Agents <span class="source-tag">官方 · 高</span></b>定义 task、trial、grader、trajectory、outcome、evaluation harness 与 agent harness，并给出多轮 Agent 评估方法。<br><a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents" target="_blank" rel="noopener noreferrer">anthropic.com/engineering/demystifying-evals-for-ai-agents</a></li>
+    <li><b>S07 · Anthropic — Prompt Engineering Overview <span class="source-tag">官方文档 · 高</span></b>提示工程定义、评测先行及指令、示例、分节等基础策略；持续更新页面。<br><a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener noreferrer">platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview</a></li>
+    <li><b>S08 · OpenAI — Unrolling the Codex Agent Loop <span class="source-tag">官方 · 高</span></b>拆解推理、工具调用、结果回填与继续推理的 agent loop，并说明 shell sandbox 不自动覆盖 MCP server 工具。<br><a href="https://openai.com/index/unrolling-the-codex-agent-loop/" target="_blank" rel="noopener noreferrer">openai.com/index/unrolling-the-codex-agent-loop</a></li>
+    <li><b>S09 · OpenAI — Harness Engineering <span class="source-tag">团队案例 · 高</span></b>展示 agent-first 仓库中的 AGENTS.md、版本化 docs、CI、结构测试、可观测性与持续清理；原文提醒不要脱离其投入条件泛化。<br><a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noopener noreferrer">openai.com/index/harness-engineering</a></li>
+    <li><b>S10 · OpenAI Cookbook — Agent Improvement Loop <span class="source-tag">官方 Cookbook · 高</span></b>把 harness 定义为模型周边的完整契约，并用 traces、反馈、evals 与 Codex 修改形成可重跑改进闭环。<br><a href="https://developers.openai.com/cookbook/examples/agents_sdk/agent_improvement_loop" target="_blank" rel="noopener noreferrer">developers.openai.com/cookbook/examples/agents_sdk/agent_improvement_loop</a></li>
+  </ol>
+  <h3>基础论文、协议与综述</h3>
+  <ol class="references" style="counter-reset:ref 7">
+    <li><b>S04 · Model Context Protocol — Introduction <span class="source-tag">官方文档 · 高</span></b>MCP 是连接 resources、prompts 与 tools 的开放标准，不等于完整环境工程。<br><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer">modelcontextprotocol.io</a></li>
+    <li><b>S05 · Yao et al. — ReAct <span class="source-tag">原始论文 · 高</span></b>推理 trace 与任务行动交替，让模型通过知识库或环境获得额外信息。<br><a href="https://arxiv.org/abs/2210.03629" target="_blank" rel="noopener noreferrer">arXiv:2210.03629</a></li>
+    <li><b>S06 · Lilian Weng — LLM Powered Autonomous Agents <span class="source-tag">研究综述 · 高</span></b>以规划、记忆和工具使用组织早期 LLM Agent 系统，并总结有限上下文与长期规划等挑战。<br><a href="https://lilianweng.github.io/posts/2023-06-23-agent/" target="_blank" rel="noopener noreferrer">lilianweng.github.io/posts/2023-06-23-agent</a></li>
+    <li><b>S15 · MCP Specification 2025-11-25 <span class="source-tag">开放规范 · 高</span></b>规定 tools 的显式同意、授权与安全注意事项；协议层不能强制所有安全原则。<br><a href="https://modelcontextprotocol.io/specification/2025-11-25" target="_blank" rel="noopener noreferrer">modelcontextprotocol.io/specification/2025-11-25</a></li>
+    <li><b>S16 · Google DeepMind — Genie 3 <span class="source-tag">官方研究 · 高</span></b>支持“可交互生成环境可用于 Agent 训练与评测”的陈述；原文并未使用 Environment Engineering 这一命名。<br><a href="https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/" target="_blank" rel="noopener noreferrer">deepmind.google/blog/genie-3-a-new-frontier-for-world-models</a></li>
+  </ol>
+  <h3>Environment Engineering 的直接来源</h3>
+  <ol class="references" style="counter-reset:ref 12">
+    <li><b>S12 · Agentic Environment Engineering for Large Language Models <span class="source-tag emerging">中科院预印本 · 中</span></b>精确术语的直接来源；按环境建模、合成、评测、应用及 agent–environment 共演化组织研究版图。尚未成为行业规范。<br><a href="https://arxiv.org/abs/2606.12191" target="_blank" rel="noopener noreferrer">arXiv:2606.12191</a></li>
+    <li><b>S13 · EurekAgent: Agent Environment Engineering Is All You Need <span class="source-tag emerging">清华 / 智谱 AI 预印本 · 中</span></b>把自主科研 Agent 的瓶颈从预设 workflow 转向资源、约束和接口的环境设计。<br><a href="https://arxiv.org/abs/2606.13662" target="_blank" rel="noopener noreferrer">arXiv:2606.13662</a></li>
+    <li><b>S14 · THU-Team-Eureka — EurekAgent <span class="source-tag practice">开源实现 · 中高</span></b>以 permissions、artifacts、budgets 与 human-in-the-loop 四个维度提供可核验原型。<br><a href="https://github.com/THU-Team-Eureka/EurekAgent" target="_blank" rel="noopener noreferrer">github.com/THU-Team-Eureka/EurekAgent</a></li>
+  </ol>
+  <h3>新兴命名与工程社区视角</h3>
+  <ol class="references" style="counter-reset:ref 15">
+    <li><b>S11 · Birgitta Böckeler / Thoughtworks — Harness Engineering for Coding Agent Users <span class="source-tag emerging">实践者文章 · 中</span></b>梳理 coding-agent 语境中的 harness；作者明确限制了适用边界。<br><a href="https://martinfowler.com/articles/harness-engineering.html" target="_blank" rel="noopener noreferrer">martinfowler.com/articles/harness-engineering.html</a></li>
+    <li><b>S17 · Addy Osmani — Loop Engineering <span class="source-tag emerging">个人框架 · 中低</span></b>系统化传播 Loop Engineering；原文明说仍处早期、作者持保留并警惕 token 成本。<br><a href="https://addyosmani.com/blog/loop-engineering/" target="_blank" rel="noopener noreferrer">addyosmani.com/blog/loop-engineering</a></li>
+    <li><b>S18 · LangChain — The Art of Loop Engineering <span class="source-tag emerging">厂商实践 · 中</span></b>从 agent、验证、事件驱动和持续改进四层循环讨论生产实现。<br><a href="https://www.langchain.com/blog/the-art-of-loop-engineering" target="_blank" rel="noopener noreferrer">langchain.com/blog/the-art-of-loop-engineering</a></li>
+  </ol>
+  <div class="warning"><b>结论等级：</b>精确术语已经存在，但共识仍低。S12、S13 是 2026 年预印本；S09 是特定团队案例；S11、S17、S18 是实践者或厂商视角。引用时应保留这些限定。</div>
+</section>
+
+<footer class="footer"><b>智能体环境工程手册</b> · 研究版 v1.0 · 2026 年 7 月<br>单文件 HTML，无远程脚本、字体或图标依赖。第三方资料版权归原作者所有。</footer>
+</main>
+</div>
+<script>
+const sections=[...document.querySelectorAll('section[id]')],links=[...document.querySelectorAll('#toc a')];
+const setActive=id=>links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+id));
+const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)setActive(entry.target.id)}),{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(section=>observer.observe(section));
+addEventListener('scroll',()=>{const d=document.documentElement;document.querySelector('#progress').style.width=`${100*(d.scrollTop/(d.scrollHeight-d.clientHeight||1))}%`},{passive:true});
+</script>
+</body>
+</html>
