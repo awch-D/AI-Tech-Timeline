@@ -1051,19 +1051,19 @@
         <div class="codesnippet">
           <span class="code-lang">markdown &middot; intent.md</span>
           <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
-<pre># Intent: claims status self-service
-Author: J. Ortiz (claims operations). Status: draft.
-## Problem
-Customers phone the contact center to ask where their claim is.
-Handlers spend roughly a third of call time on status-only queries.
-## Proposed outcome
-Customers see claim status, next step and expected date in the portal.
-## Affected users and systems
-Claims handlers, portal team, claims-core API.
-## Constraints
-No new PII in the portal session. Existing authentication only.
-## Open questions
-Do third-party loss adjusters need access too?</pre>
+<pre># 意图：理赔状态自助查询
+提出者：J. Ortiz（理赔运营）。状态：草稿。
+## 问题
+客户打电话到客服中心询问自己的理赔进行到哪一步了。
+坐席大约三分之一的通话时间花在纯状态查询上。
+## 期望结果
+客户能在门户中看到理赔状态、下一步和预计日期。
+## 受影响的用户与系统
+理赔坐席、门户团队、claims-core API。
+## 约束
+门户会话中不得引入新的 PII。仅使用现有的身份认证。
+## 待解问题
+第三方公估人是否也需要访问权限？</pre>
         </div>
       </div>
 
@@ -1129,12 +1129,11 @@ Do third-party loss adjusters need access too?</pre>
         <div class="codesnippet">
           <span class="code-lang">prompt</span>
           <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
-<pre>Read the attached intent.md and produce a requirements and design spec
-for integrating it into our existing codebase. Apply the skills available
-to you so the plan conforms to our brand guidelines, security policies
-and UX standards. Document the spec fully as spec.md, ready to hand to
-the engineering team. Describe clearly any areas of concern, especially
-where you cannot satisfy contradicting policies.</pre>
+<pre>读取附带的 intent.md，产出一份需求与设计规格，说明如何把它集成进
+我们现有的代码库。运用你可用的 skills，使方案符合我们的品牌规范、
+安全策略与 UX 标准。把规格完整记录为 spec.md，达到可直接交付给
+工程团队的程度。清楚地说明任何值得关注的地方，尤其是那些你无法
+同时满足相互冲突的策略之处。</pre>
         </div>
       </div>
 
@@ -1199,25 +1198,25 @@ where you cannot satisfy contradicting policies.</pre>
         <div class="codesnippet">
           <span class="code-lang">markdown &middot; plan.md</span>
           <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
-<pre># Plan: claims status self-service (from intent.md 2026-06-02)
+<pre># 计划：理赔状态自助查询（来自 intent.md 2026-06-02）
 
-## Files that change
+## 会改动的文件
 
-portal/src/claims/StatusPanel.tsx (new), claims-api/routes/status.py, claims-api/tests/test_status.py
+portal/src/claims/StatusPanel.tsx（新增）、claims-api/routes/status.py、claims-api/tests/test_status.py
 
-## Order of work
+## 工作顺序
 
-1. Add the status endpoint behind existing auth.
-2. Panel against the endpoint.
-3. Wire into the portal nav.
+1. 在现有身份认证之后新增状态查询端点。
+2. 让面板对接该端点。
+3. 接入门户导航。
 
-## Risks
+## 风险
 
-The claims-core API rate-limits at 50 rps; the panel must cache.
+claims-core API 的限流是 50 rps；面板必须做缓存。
 
-## Proof
+## 证明
 
-test_status.py covers the four claim states; screenshot matches the approved mock.</pre>
+test_status.py 覆盖了四种理赔状态；截图与已批准的设计稿一致。</pre>
         </div>
       </div>
 
@@ -1282,21 +1281,21 @@ test_status.py covers the four claim states; screenshot matches the approved moc
           <span class="code-lang">markdown &middot; CLAUDE.md</span>
           <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
 <pre># Payments service
-## Commands
-- Build: make build
-- Test: make test (unit), make itest (integration, needs docker)
-- Lint: make lint (runs in CI; fix before pushing)
-## Conventions
-- Java 21, Spring Boot 3. No new Lombok.
-- Money is always BigDecimal, never double.
-- Every endpoint needs an integration test in src/itest.
-## Architecture
-- api/ holds REST controllers, core/ holds domain logic,
-  adapters/ talks to external systems.
-- Kafka events are defined in schemas/; never edit generated classes.
-## Things Claude gets wrong
-- Do not bump dependency versions; the platform team owns them.
-- The legacy v1/ package is frozen; changes go in v2/.</pre>
+## 命令
+- 构建：make build
+- 测试：make test（单元），make itest（集成，需要 docker）
+- Lint：make lint（在 CI 中运行；推送前先修好）
+## 约定
+- Java 21，Spring Boot 3。不要新增 Lombok。
+- 金额一律用 BigDecimal，绝不用 double。
+- 每个端点都需要在 src/itest 下有一个集成测试。
+## 架构
+- api/ 放 REST 控制器，core/ 放领域逻辑，
+  adapters/ 负责与外部系统对接。
+- Kafka 事件定义在 schemas/ 中；绝不要修改生成的类。
+## Claude 容易搞错的地方
+- 不要升级依赖版本；它们由平台团队负责。
+- 遗留的 v1/ 包已冻结；改动都放到 v2/。</pre>
         </div>
       </div>
 
@@ -1526,14 +1525,14 @@ behavior that does not match plan.md. Do not fix anything; report only.</pre>
         <div class="codesnippet">
           <span class="code-lang">markdown &middot; CLAUDE.md 验证段落</span>
           <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
-<pre>## Verifying your work
+<pre>## 验证你的工作
 
-- Build: make build (must finish with "Build succeeded")
-- Test: make test (all green; never skip or delete a failing test)
-- Lint: make lint (zero warnings)
+- 构建：make build（必须以 "Build succeeded" 结束）
+- 测试：make test（全部通过；绝不跳过或删除失败的测试）
+- Lint：make lint（零警告）
 
-Run all three before reporting any task complete, and paste the output.
-If a test fails, fix the code, not the test.</pre>
+在报告任何任务完成之前跑完这三项，并把输出粘贴出来。
+如果测试失败，修代码，不是修测试。</pre>
         </div>
       </div>
 
@@ -1675,19 +1674,19 @@ jobs:
         <div class="codesnippet">
           <span class="code-lang">markdown &middot; REVIEW.md</span>
           <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
-<pre># Review instructions
-## Passes
-Run three passes and tag each finding with its pass:
-- Bugs: logic errors, broken edge cases, subtle regressions
-- Security: injection risks, authentication gaps, PII in logs
-- Compliance: the change matches spec.md, plan.md and our design principles
-## What Important means here
-Reserve Important for findings that would break behavior, leak data
-or breach a policy. Style and naming are nits.
-## Cap the nits
-Report at most five nits per review; summarize the rest as a count.
-## Do not report
-Generated files under src/gen/ and anything CI already enforces.</pre>
+<pre># 评审指令
+## 评审轮次
+跑三轮，并为每条发现项标注它属于哪一轮：
+- Bugs：逻辑错误、边界情况失效、隐蔽的回归
+- Security：注入风险、身份认证缺口、日志中的 PII
+- Compliance：改动是否符合 spec.md、plan.md 与我们的设计原则
+## 这里的 Important 指什么
+Important 只留给那些会破坏行为、泄露数据或违反策略的发现项。
+风格与命名属于 nit。
+## 限制 nit 的数量
+每次评审最多报告五条 nit；其余的汇总为一个计数。
+## 不要报告
+src/gen/ 下的生成文件，以及任何 CI 已经强制约束的内容。</pre>
         </div>
       </div>
 
