@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI 原生 SDLC 实战手册 · 中文学习页</title>
+<title>AI Native SDLC 实战手册 · 中文学习页</title>
 
 <!-- ============ SEO ============ -->
 <meta name="description" content="AI 原生软件开发生命周期实战手册（The AI-Native SDLC Playbook）中文版：Claude Academy 14 课完整转述，覆盖 intent.md、CLAUDE.md、skills、子代理、反馈闭环、CI evals、PR 评审、hooks 审批门禁、CI/CD 与指标闭环。" />
-<meta name="keywords" content="AI-Native SDLC, AI 原生 SDLC, Claude Code, intent.md, CLAUDE.md, Agent Skills, hooks, evals, DORA, 治理, 受监管企业" />
+<meta name="keywords" content="AI-Native SDLC, AI Native SDLC, Claude Code, intent.md, CLAUDE.md, Agent Skills, hooks, evals, DORA, 治理, 受监管企业" />
 <meta name="author" content="Arno" />
 <meta name="theme-color" content="#5b6cff" />
 
@@ -943,18 +943,18 @@
       <p>拿安全瓶颈举例。安全团队的人员编制是按人的产出规模来定的，所以当 agent 把代码产出翻倍时，要么评审队列堆积，要么代码在评审不足的状态下上线。受监管的组织两个结果都不能接受，因此它的安全与策略检查必须跟上 agent 的节奏。</p>
       <p>要更好地兑现 agent 化 AI 的生产力收益并保障其安全，传统 SDLC 需要经历与实现阶段同等程度的转型。</p>
 
-      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v6h-6"/></svg>什么是 AI 原生 SDLC</h3>
-      <p>AI 原生 SDLC 是一套重新构想的流程，它把原有的控制目标与新的强制手段结合起来。流程不再是线性流转，而是变成一个循环，AI 嵌入其中每一个环节。AI 原生 SDLC 推动自动化的交接与后续 play 的自动触发，从而缓解传统 SDLC 各阶段之间手工、笨重的交接问题。</p>
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v6h-6"/></svg>什么是 AI Native SDLC</h3>
+      <p>AI Native SDLC 是一套重新构想的流程，它把原有的控制目标与新的强制手段结合起来。流程不再是线性流转，而是变成一个循环，AI 嵌入其中每一个环节。AI Native SDLC 推动自动化的交接与后续 play 的自动触发，从而缓解传统 SDLC 各阶段之间手工、笨重的交接问题。</p>
       <div class="figure-note">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         <div>配图说明：左侧是传统线性 SDLC，右侧是 AI 原生的连续循环，人位于循环之上，负责发起、指挥和治理。</div>
       </div>
 
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>转变</h3>
-      <p>下表列出的是传统 SDLC 与由 Claude 支撑的 AI 原生 SDLC 两端的形态。多数组织处在两栏之间的某个位置。</p>
+      <p>下表列出的是传统 SDLC 与由 Claude 支撑的 AI Native SDLC 两端的形态。多数组织处在两栏之间的某个位置。</p>
       <div class="table-wrap">
         <table class="shift-table">
-          <thead><tr><th>阶段</th><th>传统 SDLC</th><th>AI 原生 SDLC</th></tr></thead>
+          <thead><tr><th>阶段</th><th>传统 SDLC</th><th>AI Native SDLC</th></tr></thead>
           <tbody>
             <tr><td><b>规划</b></td><td>需求由委员会收集，经工作坊和签署确认层层提炼，再由人手工写成文档</td><td>Claude 直接从源头综合出痛点，并把它们捕获进 <code>intent.md</code>——该文件既人类可读，又机器可执行</td></tr>
             <tr><td><b>设计</b></td><td>规格由分析师撰写，再由设计师解析</td><td>需求与设计压缩进与 agent 的一次工作会话，由编码为 skills 的标准引导，纳入 Git 版本管理</td></tr>
@@ -1244,12 +1244,12 @@ test_status.py 覆盖了四种理赔状态；截图与已批准的设计稿一�
       <p>这个转变的方向，是从「用户盯着 agent 逐个做编辑并评审这些动作」，转向「在较长的自主会话之后评审产物」。auto mode 配合 worktrees 使用时，还能进一步支撑个人与团队层面的并行，并且是自主运行 SDLC、闭合循环（如 <strong>Stage 6 维护</strong> 所述）的基础。</p>
 
       <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>遗留系统与事实来源</h3>
-      <p>现有的 SDLC 流程很可能已经在追踪各类产物了，只是没有以 Markdown 文件的形式。工作项可能在 Jira 里，需求在某个内置了合规可追溯性的工具里，设计在 Figma 里，变更审批在某个变更委员会那里。这些系统很难被取代，因为审计师和监管方已经接受了它们，并且其他团队依赖它们——所以 AI 原生 SDLC 必须适配既有现实。对流程产出的每一类产物，应当指定其中一个系统为事实来源，其余系统持有副本或链接。</p>
+      <p>现有的 SDLC 流程很可能已经在追踪各类产物了，只是没有以 Markdown 文件的形式。工作项可能在 Jira 里，需求在某个内置了合规可追溯性的工具里，设计在 Figma 里，变更审批在某个变更委员会那里。这些系统很难被取代，因为审计师和监管方已经接受了它们，并且其他团队依赖它们——所以 AI Native SDLC 必须适配既有现实。对流程产出的每一类产物，应当指定其中一个系统为事实来源，其余系统持有副本或链接。</p>
       <p>以下几种配置都能做到「只有一个事实来源」，而具体选哪种可以因产物而异：</p>
       <ul>
         <li><strong>以仓库为事实来源。</strong> Markdown 产物是权威记录，遗留系统在提交中引用这些文件。对工程主导的组织，这可能是最干净的配置之一，因为所有记录都活在一个工具里、只有一个时间戳权威。</li>
         <li><strong>以遗留系统为事实来源。</strong> Jira、ServiceNow 或需求管理工具持有权威记录，Markdown 产物是工作副本。Claude 在会话开始时读取该记录，并在产出规格或计划的同一个会话内，通过 Model Context Protocol（MCP）连接器把结果写回去。</li>
-        <li><strong>以建立链接为最低标准。</strong> 所有产物都记下记录 ID，所有遗留记录都包含对应 Markdown 文件的提交 SHA。当存在两个事实来源时，链接这一选项是转向 AI 原生 SDLC 的一个好起点。</li>
+        <li><strong>以建立链接为最低标准。</strong> 所有产物都记下记录 ID，所有遗留记录都包含对应 Markdown 文件的提交 SHA。当存在两个事实来源时，链接这一选项是转向 AI Native SDLC 的一个好起点。</li>
       </ul>
       <p>只要两者之间存在链接，或者其中一个被宣告为事实来源，遗留系统与 AI 原生的 Markdown 优先体系就可以共存。</p>
     </section>
@@ -2075,7 +2075,7 @@ tiers:
 
     <footer class="site-footer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v6h-6"/></svg>
-      AI 原生 SDLC 实战手册 · 中文转述自 Claude Academy 课程 · 2026.08 &nbsp;|&nbsp; <a href="index.html">返回技术热词时间线</a>
+      AI Native SDLC 实战手册 · 中文转述自 Claude Academy 课程 · 2026.08 &nbsp;|&nbsp; <a href="index.html">返回技术热词时间线</a>
     </footer>
   </main>
 </div>
