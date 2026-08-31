@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 原生 SDLC 实战手册 · 中文学习页</title>
+
+<!-- ============ SEO ============ -->
+<meta name="description" content="AI 原生软件开发生命周期实战手册（The AI-Native SDLC Playbook）中文版：Claude Academy 14 课完整转述，覆盖 intent.md、CLAUDE.md、skills、子代理、反馈闭环、CI evals、PR 评审、hooks 审批门禁、CI/CD 与指标闭环。" />
+<meta name="keywords" content="AI-Native SDLC, AI 原生 SDLC, Claude Code, intent.md, CLAUDE.md, Agent Skills, hooks, evals, DORA, 治理, 受监管企业" />
+<meta name="author" content="Arno" />
+<meta name="theme-color" content="#5b6cff" />
+
+<!-- ============ Favicon (inline SVG) ============ -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6cff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M21 12a9 9 0 1 1-6.219-8.56'/><path d='M21 3v6h-6'/><path d='M12 8v4l3 2'/></svg>" />
+
+<style>
+  :root {
+    /* 与 index.html 时间线主页同一套配色 */
+    --ink: #1d1d1f;
+    --ink-2: #48484a;
+    --ink-3: #8e8e93;
+    --line: rgba(0, 0, 0, .08);
+    --glass: rgba(255, 255, 255, .72);
+    --bg: #f5f5f7;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --gray: #aeaeb2;
+
+    /* 手册页派生变量 */
+    --text-primary: var(--ink);
+    --text-secondary: var(--ink-2);
+    --text-muted: var(--ink-3);
+    --glass-bg: var(--glass);
+    --glass-border: rgba(255, 255, 255, .78);
+    --glass-shadow: 0 8px 32px rgba(30, 38, 80, .08);
+    --glass-shadow-hover: 0 12px 40px rgba(30, 38, 80, .12);
+    --accent: #5b6cff;
+    --accent-soft: rgba(91, 108, 255, .10);
+    --accent-strong: #4453e0;
+    --code-bg: #1f2138;
+    --code-text: #e8eaf6;
+    --border-soft: var(--line);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --font-cn: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
+    --font-mono: "SF Mono", "JetBrains Mono", "Menlo", "Monaco", "Consolas", monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-cn);
+    color: var(--text-primary);
+    line-height: 1.75;
+    font-size: 16px;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(99, 102, 241, .10), transparent 60%),
+      radial-gradient(1000px 500px at -10% 20%, rgba(52, 199, 89, .08), transparent 60%),
+      radial-gradient(900px 700px at 50% 110%, rgba(255, 149, 0, .07), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* ============== Layout ============== */
+  .layout {
+    display: grid;
+    grid-template-columns: 268px 1fr;
+    max-width: 1340px;
+    margin: 0 auto;
+    gap: 32px;
+    padding: 24px 32px 80px;
+  }
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; padding: 14px; gap: 16px; }
+    .sidebar { position: static !important; max-height: none !important; }
+  }
+
+  /* ============== Back link ============== */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 14px;
+    padding: 7px 14px;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(20px) saturate(1.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    color: var(--accent-strong);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--glass-shadow);
+    transition: transform .2s ease, background .2s ease;
+  }
+  .back-link:hover { transform: translateX(-3px); background: #fff; }
+  .back-link svg { width: 15px; height: 15px; }
+
+  /* ============== Sidebar ============== */
+  .sidebar {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 16px;
+    box-shadow: var(--glass-shadow);
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 0 6px 12px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .sidebar-brand svg { width: 26px; height: 26px; flex-shrink: 0; color: var(--accent); }
+  .sidebar-brand b { font-size: 14px; letter-spacing: .2px; }
+  .sidebar-brand small { display: block; color: var(--text-muted); font-size: 11px; font-weight: 400; }
+  .toc { list-style: none; padding: 0; margin: 0; }
+  .toc li a {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 11px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 9px;
+    font-size: 13px;
+    transition: all .2s ease;
+    margin-bottom: 1px;
+  }
+  .toc li a:hover { background: var(--accent-soft); color: var(--accent-strong); }
+  .toc li a.active { background: var(--accent); color: #fff; font-weight: 500; }
+  .toc li a.active .tnum { background: rgba(255, 255, 255, .26); color: #fff; }
+  .toc .tnum {
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border-radius: 5px;
+    padding: 1px 0;
+  }
+  .toc-stage {
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 12px 11px 4px;
+    font-weight: 700;
+  }
+
+  /* ============== Hero ============== */
+  .hero {
+    background: linear-gradient(135deg, rgba(91, 108, 255, .10), rgba(255, 105, 180, .06));
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--radius-lg);
+    padding: 44px 40px;
+    margin-bottom: 24px;
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(91, 108, 255, .12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(91, 108, 255, .10);
+    color: var(--accent-strong);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .hero-tag svg { width: 13px; height: 13px; }
+  .hero h1 {
+    font-size: 38px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    letter-spacing: -.5px;
+    line-height: 1.25;
+    position: relative;
+  }
+  .hero .en-title {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin: 0 0 16px;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin: 0 0 24px;
+    max-width: 760px;
+    position: relative;
+  }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; position: relative; }
+  .meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, .62);
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-soft);
+    text-decoration: none;
+  }
+  .meta-chip svg { width: 13px; height: 13px; color: var(--accent); }
+  a.meta-chip:hover { background: #fff; color: var(--accent-strong); }
+
+  /* ============== Section ============== */
+  section {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 36px 40px;
+    margin-bottom: 22px;
+    box-shadow: var(--glass-shadow);
+    scroll-margin-top: 20px;
+  }
+  @media (max-width: 980px) { section { padding: 24px 20px; } .hero { padding: 28px 20px; } .hero h1 { font-size: 27px; } }
+  section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -.3px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+  section h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px; height: 34px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #7c8aff);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(91, 108, 255, .30);
+  }
+  section h3 {
+    font-size: 17.5px;
+    font-weight: 600;
+    margin: 28px 0 10px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  section h3 svg { width: 17px; height: 17px; color: var(--accent); flex-shrink: 0; }
+  section h4 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; }
+  section p { margin: 10px 0; color: var(--text-secondary); }
+  section strong { color: var(--text-primary); }
+  .section-lead { color: var(--text-muted); font-size: 13.5px; margin-top: 0; margin-bottom: 20px; }
+  .stage-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    letter-spacing: .3px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    padding: 2px 9px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  /* ============== Lists ============== */
+  section ul, section ol { color: var(--text-secondary); padding-left: 22px; margin: 10px 0; }
+  section li { margin: 5px 0; }
+  .steps { list-style: none; counter-reset: st; padding: 0; margin: 14px 0; }
+  .steps > li {
+    counter-increment: st;
+    position: relative;
+    padding: 12px 16px 12px 50px;
+    background: rgba(255, 255, 255, .55);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 14.5px;
+    color: var(--text-secondary);
+  }
+  .steps > li::before {
+    content: counter(st);
+    position: absolute;
+    left: 13px; top: 12px;
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--accent), #7c8aff);
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12.5px;
+    font-family: var(--font-mono);
+  }
+
+  /* ============== Table ============== */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-soft);
+    margin: 18px 0;
+    background: rgba(255, 255, 255, .55);
+    -webkit-overflow-scrolling: touch;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 480px; }
+  table thead { background: rgba(91, 108, 255, .06); }
+  table th {
+    text-align: left;
+    padding: 11px 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  table td {
+    padding: 11px 15px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+  table tr:last-child td { border-bottom: 0; }
+  table tr:hover td { background: rgba(91, 108, 255, .03); }
+  table code, .inline-code {
+    background: rgba(91, 108, 255, .10);
+    color: var(--accent-strong);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 12.2px;
+  }
+  table.gloss-table td:first-child {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+  table.gloss-table td:nth-child(2) { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+
+  /* 传统 vs AI 原生 双列对照 */
+  .shift-table td:first-child { background: rgba(174, 174, 178, .07); }
+  .shift-table td:last-child { background: rgba(91, 108, 255, .04); }
+  .shift-table th:first-child { color: var(--text-muted); }
+  .shift-table th:last-child { color: var(--accent-strong); }
+
+  /* ============== Code Block ============== */
+  .codesnippet {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius-md);
+    padding: 34px 18px 16px;
+    margin: 16px 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.62;
+    overflow-x: auto;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(30, 32, 60, .16);
+    -webkit-overflow-scrolling: touch;
+  }
+  .codesnippet pre { margin: 0; white-space: pre; }
+  .codesnippet .code-lang {
+    position: absolute;
+    top: 9px; left: 18px;
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, .48);
+    font-family: var(--font-mono);
+    letter-spacing: .4px;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 7px; right: 10px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: rgba(255, 255, 255, .75);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .18s ease;
+    font-family: var(--font-cn);
+  }
+  .copy-btn:hover { background: rgba(255, 255, 255, .18); color: #fff; }
+  .copy-btn.copied { background: rgba(52, 199, 89, .20); color: #6ed882; border-color: rgba(52, 199, 89, .30); }
+  .copy-btn svg { width: 12px; height: 12px; vertical-align: -2px; margin-right: 3px; }
+
+  /* ============== Callout / Insight ============== */
+  .insight {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 13px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .55);
+    border: 1px solid var(--border-soft);
+    margin: 14px 0;
+  }
+  .insight.warn { background: linear-gradient(135deg, rgba(255, 149, 0, .08), rgba(255, 149, 0, .02)); border-color: rgba(255, 149, 0, .25); }
+  .insight.success { background: linear-gradient(135deg, rgba(52, 199, 89, .08), rgba(52, 199, 89, .02)); border-color: rgba(52, 199, 89, .25); }
+  .insight.danger { background: linear-gradient(135deg, rgba(255, 59, 48, .07), rgba(255, 59, 48, .02)); border-color: rgba(255, 59, 48, .25); }
+  .insight-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .insight.warn .insight-icon { background: rgba(255, 149, 0, .12); color: var(--orange); }
+  .insight.success .insight-icon { background: rgba(52, 199, 89, .12); color: var(--green); }
+  .insight.danger .insight-icon { background: rgba(255, 59, 48, .12); color: var(--red); }
+  .insight-icon svg { width: 17px; height: 17px; }
+  .insight b { display: block; margin-bottom: 2px; font-size: 14.5px; }
+  .insight p { margin: 0; font-size: 13.5px; color: var(--text-secondary); }
+
+  /* 配图说明（原文的图注文字） */
+  .figure-note {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 10px;
+    align-items: start;
+    margin: 14px 0;
+    padding: 12px 16px;
+    border-left: 3px solid var(--gray);
+    background: rgba(174, 174, 178, .07);
+    border-radius: 0 10px 10px 0;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .figure-note svg { width: 17px; height: 17px; color: var(--gray); margin-top: 3px; }
+
+  /* ============== Play 五段式 ============== */
+  .play-block {
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, .48);
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .play-block > h4 {
+    margin: 0 0 8px;
+    font-size: 14.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-strong);
+  }
+  .play-block > h4 svg { width: 16px; height: 16px; }
+  .play-block > *:last-child { margin-bottom: 0; }
+
+  /* ============== Metrics (leading / lagging) ============== */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin: 14px 0;
+  }
+  .metric-card {
+    background: rgba(255, 255, 255, .62);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent), #7c8aff);
+  }
+  .metric-card.lagging::before { background: linear-gradient(90deg, var(--orange), #ffc061); }
+  .metric-card .m-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin-bottom: 5px;
+    display: block;
+  }
+  .metric-card.lagging .m-label { color: #c87600; }
+  .metric-card p { margin: 0; font-size: 13.5px; }
+
+  /* ============== Prereq chips ============== */
+  .prereq {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .prereq span {
+    font-size: 12.5px;
+    background: rgba(255, 255, 255, .66);
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    padding: 4px 12px;
+    color: var(--text-secondary);
+  }
+  .prereq span.none { color: var(--green); border-color: rgba(52, 199, 89, .3); background: rgba(52, 199, 89, .07); }
+
+  /* ============== Details / 折叠 ============== */
+  details.fold {
+    background: rgba(255, 255, 255, .60);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    margin: 14px 0;
+    overflow: hidden;
+  }
+  details.fold[open] { background: rgba(255, 255, 255, .85); }
+  details.fold > summary {
+    padding: 13px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--text-primary);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+  }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before {
+    content: '+';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  details.fold[open] > summary::before { content: '\2212'; }
+  .fold-body { padding: 0 18px 16px; font-size: 14px; color: var(--text-secondary); }
+  .fold-body > *:first-child { margin-top: 0; }
+
+  /* ============== Stage flow ============== */
+  .stage-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0;
+    align-items: center;
+  }
+  .stage-flow .sf {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, .66);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    font-size: 13px;
+    min-width: 108px;
+  }
+  .stage-flow .sf b { font-size: 13.5px; }
+  .stage-flow .sf code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--accent-strong);
+  }
+  .stage-flow .arrow { color: var(--gray); font-size: 16px; }
+
+  /* ============== Footer ============== */
+  footer.site-footer {
+    text-align: center;
+    padding: 28px 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  footer.site-footer svg {
+    width: 17px; height: 17px;
+    vertical-align: -4px;
+    margin-right: 4px;
+    color: var(--accent);
+  }
+  footer.site-footer a { color: var(--accent-strong); text-decoration: none; }
+
+  /* ============== Refs ============== */
+  .ref-list { list-style: none; padding: 0; margin: 12px 0; }
+  .ref-list li {
+    padding: 9px 13px;
+    background: rgba(255, 255, 255, .55);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    margin-bottom: 7px;
+    font-size: 13px;
+  }
+  .ref-list a { color: var(--accent-strong); text-decoration: none; word-break: break-all; }
+  .ref-list a:hover { text-decoration: underline; }
+  .ref-list .rt { display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 2px; }
+
+  /* ============== Progress + Back to top ============== */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #a78bfa, #f472b6);
+    z-index: 1000;
+    transition: width .08s linear;
+    box-shadow: 0 0 8px rgba(91, 108, 255, .5);
+  }
+  .back-to-top {
+    position: fixed;
+    right: 22px; bottom: 26px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .75);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 6px 20px rgba(30, 38, 80, .12);
+    color: var(--accent-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+    z-index: 999;
+  }
+  .back-to-top.visible { opacity: 1; pointer-events: auto; }
+  .back-to-top:hover { transform: translateY(-2px); background: #fff; }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  /* ============== Print ============== */
+  @media print {
+    body { background: #fff !important; color: #000 !important; }
+    .sidebar, .back-to-top, .progress-bar, .copy-btn, .back-link { display: none !important; }
+    .layout { display: block; max-width: 100%; padding: 0; }
+    section, .hero { box-shadow: none; border: 1px solid #ddd; background: #fff; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ============ Sidebar ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v6h-6"/><path d="M12 8v4l3 2"/></svg>
+      <div>
+        <b>AI 原生 SDLC</b>
+        <small>The AI-Native SDLC Playbook</small>
+      </div>
+    </div>
+    <ul class="toc" id="toc">
+      <li><a href="#about"><span class="tnum">00</span>关于这份中文版</a></li>
+      <li><a href="#glossary"><span class="tnum">TT</span>术语对照表</a></li>
+      <li><a href="#positioning"><span class="tnum">CS</span>课程定位与结构</a></li>
+      <li class="toc-stage">引言</li>
+      <li><a href="#lesson-1"><span class="tnum">01</span>引言</a></li>
+      <li class="toc-stage">Stage 1 规划</li>
+      <li><a href="#lesson-2"><span class="tnum">02</span>捕获为 intent.md</a></li>
+      <li class="toc-stage">Stage 2 设计</li>
+      <li><a href="#lesson-3"><span class="tnum">03</span>需求与设计</a></li>
+      <li class="toc-stage">Stage 3 构建</li>
+      <li><a href="#lesson-4"><span class="tnum">04</span>plan mode 作为默认起点</a></li>
+      <li><a href="#lesson-5"><span class="tnum">05</span>CLAUDE.md</a></li>
+      <li><a href="#lesson-6"><span class="tnum">06</span>用 skills 承载机构知识</a></li>
+      <li><a href="#lesson-7"><span class="tnum">07</span>并行会话与子代理</a></li>
+      <li class="toc-stage">Stage 4 测试</li>
+      <li><a href="#lesson-8"><span class="tnum">08</span>给 Claude 一个反馈闭环</a></li>
+      <li><a href="#lesson-9"><span class="tnum">09</span>在 CI 中持续跑 evals</a></li>
+      <li class="toc-stage">Stage 5 部署</li>
+      <li><a href="#lesson-10"><span class="tnum">10</span>AI 进入 PR 评审闭环</a></li>
+      <li><a href="#lesson-11"><span class="tnum">11</span>hooks 作为审批门禁</a></li>
+      <li><a href="#lesson-12"><span class="tnum">12</span>CI/CD 集成与部署</a></li>
+      <li class="toc-stage">Stage 6 维护</li>
+      <li><a href="#lesson-13"><span class="tnum">13</span>用指标闭合整个循环</a></li>
+      <li class="toc-stage">结语</li>
+      <li><a href="#lesson-14"><span class="tnum">14</span>结语与资源</a></li>
+      <li><a href="#fidelity"><span class="tnum">FN</span>转述完整性说明</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <a class="back-link" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      返回技术热词时间线
+    </a>
+
+    <!-- ============ Hero ============ -->
+    <div class="hero">
+      <span class="hero-tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>
+        工程范式 · 2026-02
+      </span>
+      <h1>AI 原生软件开发生命周期实战手册</h1>
+      <p class="en-title">The AI-Native SDLC Playbook &middot; 中文版</p>
+      <p class="subtitle">
+        当 agent 写掉大部分代码后，瓶颈转移到构建阶段两侧——规划、评审/测试与部署仍以人的速度运行。这份手册用 12 个 play、6 个阶段，把原有的控制目标与新的强制手段结合起来：意图捕获为 <code class="inline-code">intent.md</code>，机构知识固化为 <code class="inline-code">CLAUDE.md</code> 与 skills，治理在 AI 行动的当刻由 hooks 强制执行。
+      </p>
+      <div class="hero-meta">
+        <span class="meta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Claude Academy 课程
+        </span>
+        <a class="meta-chip" href="https://academy.claude.com/courses/ai-native-sdlc-playbook" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          academy.claude.com/courses/ai-native-sdlc-playbook
+        </a>
+        <span class="meta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          14 课 · 约 1 小时
+        </span>
+        <span class="meta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          转述日期 2026-08-31
+        </span>
+        <span class="meta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          无测验 · 无结业徽章
+        </span>
+      </div>
+    </div>
+
+    <!-- ============ 关于这份中文版 ============ -->
+    <section id="about">
+      <h2><span class="num">00</span>关于这份中文版</h2>
+      <p class="section-lead">这是 Claude Academy 英文采集版的完整中文转述，逐课对应、不删减、不添加原文没有的主张。</p>
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>转述原则</h3>
+      <div class="insight">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div><b>代码示例、文件名、配置键名一律保持英文原样</b><p><code class="inline-code">intent.md</code>、<code class="inline-code">CLAUDE.md</code>、<code class="inline-code">disableBypassPermissionsMode</code> 这类标识符译出来就没法用了。</p></div>
+      </div>
+      <div class="insight">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+        <div><b>产品名与专有名词保留英文</b><p>Claude Code、Claude Cowork、Claude Design、Claude Tag、Jira、ServiceNow、Figma、Prometheus、DORA 等。</p></div>
+      </div>
+      <div class="insight warn">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div><b>作者刻意的措辞区分在中文里同样保留，不合并成一个词</b><p>skill 是「建议性控制」而 hook 是「确定性层」；评审发现项分 Important 与 Nit。</p></div>
+      </div>
+      <div class="insight success">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <div><b>结构一一对应</b><p>原文的表格结构、五段式 play 结构、leading/lagging 双指标一一对应保留。</p></div>
+      </div>
+    </section>
+
+    <!-- ============ 术语对照表 ============ -->
+    <section id="glossary">
+      <h2><span class="num">TT</span>术语对照表</h2>
+      <p class="section-lead">先定后用，全文不漂移。这张表是全文术语不漂移的依据，共 67 条。</p>
+      <details class="fold" open>
+        <summary>展开 / 收起 67 条术语对照</summary>
+        <div class="fold-body">
+          <div class="table-wrap">
+            <table class="gloss-table">
+              <thead><tr><th>英文</th><th>中文</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td>SDLC (software development lifecycle)</td><td>软件开发生命周期</td><td>首次出现标注英文缩写</td></tr>
+                <tr><td>play</td><td>play</td><td>不译。指手册里的单个可落地做法，全书 12 个</td></tr>
+                <tr><td>playbook</td><td>实战手册</td><td></td></tr>
+                <tr><td>agent</td><td>agent</td><td>不译，避免与「代理/智能体」混用</td></tr>
+                <tr><td>agentic AI / agentic coding</td><td>agent 化的 AI / agent 化编码</td><td></td></tr>
+                <tr><td>subagent</td><td>子代理</td><td></td></tr>
+                <tr><td>artifact</td><td>产物</td><td>指提交进版本控制的那份文件或记录</td></tr>
+                <tr><td>committed artifact</td><td>已提交产物</td><td></td></tr>
+                <tr><td>control</td><td>控制项</td><td>治理语境下的管控手段</td></tr>
+                <tr><td>control objective</td><td>控制目标</td><td></td></tr>
+                <tr><td>advisory control</td><td>建议性控制</td><td>skill 的定性</td></tr>
+                <tr><td>deterministic</td><td>确定性的</td><td>hook 的定性</td></tr>
+                <tr><td>gate / approval gate</td><td>门禁 / 审批门禁</td><td></td></tr>
+                <tr><td>stage gate</td><td>阶段门禁</td><td>传统 QA 的形态</td></tr>
+                <tr><td>guardrail</td><td>护栏</td><td></td></tr>
+                <tr><td>hook</td><td>hook</td><td>不译</td></tr>
+                <tr><td>skill</td><td>skill</td><td>不译</td></tr>
+                <tr><td>eval / evals</td><td>eval / evals</td><td>不译。指针对 agent 配置的回归评测套件</td></tr>
+                <tr><td>feedback loop</td><td>反馈闭环</td><td></td></tr>
+                <tr><td>verifier subagent</td><td>验证子代理</td><td></td></tr>
+                <tr><td>plan mode</td><td>plan mode</td><td>不译，Claude Code 的模式名</td></tr>
+                <tr><td>auto mode</td><td>auto mode</td><td>同上</td></tr>
+                <tr><td>worktree</td><td>worktree</td><td>不译，Git 概念</td></tr>
+                <tr><td>blast radius</td><td>影响面</td><td></td></tr>
+                <tr><td>handoff</td><td>交接</td><td></td></tr>
+                <tr><td>sign-off</td><td>签署确认</td><td></td></tr>
+                <tr><td>source of truth</td><td>事实来源</td><td></td></tr>
+                <tr><td>institutional knowledge</td><td>机构知识</td><td></td></tr>
+                <tr><td>proto-spec</td><td>原型规格</td><td>intent.md 的定性</td></tr>
+                <tr><td>originator</td><td>提出者</td><td>想法的最初提出者</td></tr>
+                <tr><td>product owner</td><td>产品负责人</td><td></td></tr>
+                <tr><td>policy owner</td><td>策略责任人</td><td></td></tr>
+                <tr><td>code owner</td><td>代码所有者</td><td>GitHub CODEOWNERS 语义</td></tr>
+                <tr><td>release manager</td><td>发布经理</td><td></td></tr>
+                <tr><td>service owner</td><td>服务责任人</td><td></td></tr>
+                <tr><td>tech lead</td><td>技术主管</td><td></td></tr>
+                <tr><td>platform engineer</td><td>平台工程师</td><td></td></tr>
+                <tr><td>branch protection</td><td>分支保护</td><td></td></tr>
+                <tr><td>check run</td><td>检查运行</td><td>CI 的检查项</td></tr>
+                <tr><td>finding</td><td>发现项</td><td>评审产出的单条问题</td></tr>
+                <tr><td>Important / Nit</td><td>Important / Nit</td><td>不译。REVIEW.md 里的严重度分级</td></tr>
+                <tr><td>rework</td><td>返工</td><td></td></tr>
+                <tr><td>first-pass</td><td>一次通过</td><td></td></tr>
+                <tr><td>survival rate</td><td>存活率</td><td></td></tr>
+                <tr><td>leading / lagging indicator</td><td>领先指标 / 滞后指标</td><td></td></tr>
+                <tr><td>control band</td><td>控制带</td><td>统计过程控制的 σ 带</td></tr>
+                <tr><td>breach</td><td>突破</td><td>控制带被突破</td></tr>
+                <tr><td>rolling baseline</td><td>滚动基线</td><td></td></tr>
+                <tr><td>Western Electric rules</td><td>Western Electric 规则</td><td>不译，统计过程控制的判异规则集</td></tr>
+                <tr><td>runbook</td><td>运行手册</td><td></td></tr>
+                <tr><td>rollback</td><td>回滚</td><td></td></tr>
+                <tr><td>headless</td><td>无人值守</td><td></td></tr>
+                <tr><td>stateless</td><td>无状态</td><td></td></tr>
+                <tr><td>non-interactive</td><td>非交互</td><td></td></tr>
+                <tr><td>sandbox</td><td>沙箱</td><td></td></tr>
+                <tr><td>egress</td><td>出网</td><td>网络流量外发</td></tr>
+                <tr><td>allowlist</td><td>允许清单</td><td></td></tr>
+                <tr><td>deny list</td><td>拒绝清单</td><td></td></tr>
+                <tr><td>sideload</td><td>侧载</td><td>绕过官方渠道安装</td></tr>
+                <tr><td>managed settings</td><td>受管设置</td><td>平台团队下发、工程师不可覆盖</td></tr>
+                <tr><td>separation of duties</td><td>职责分离</td><td></td></tr>
+                <tr><td>audit trail</td><td>审计轨迹</td><td></td></tr>
+                <tr><td>traceability</td><td>可追溯性</td><td></td></tr>
+                <tr><td>regulated enterprise</td><td>受监管企业</td><td></td></tr>
+                <tr><td>observability stack</td><td>可观测性栈</td><td></td></tr>
+                <tr><td>MDM (mobile device management)</td><td>移动设备管理</td><td></td></tr>
+                <tr><td>research preview / public beta</td><td>研究预览 / 公开测试</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ 课程定位与结构 ============ -->
+    <section id="positioning">
+      <h2><span class="num">CS</span>课程定位与结构</h2>
+      <p class="section-lead">面向对象、前置条件、学完能做到什么，以及 14 课的阶段归属。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>面向对象</h3>
+      <p>已经在用 Claude Code、但审批门禁、评审和交接仍以人的速度运行的工程、平台与安全负责人。课程明确写给大型企业，尤其是<strong>受监管企业</strong>——那里既不允许评审队列堆积，也不允许代码在评审不足的状态下上线。各 play 假定你有权改动组织的规划、评审、测试、部署方式，而不只是写代码的方式。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>前置条件</h3>
+      <p>日常能熟练使用 Claude Code，并且拥有一个你有权改动的 Git 仓库与 CI 流水线。每个 play 在「上手准备」一节各自声明自己的前置条件，其中若干个没有前置条件。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>学完能做到</h3>
+      <ul>
+        <li>解释为什么当 agent 写掉大部分代码后，规划、评审、测试、部署会成为瓶颈，以及它们为何仍以人的速度运行</li>
+        <li>把一个想法捕获为 <code class="inline-code">intent.md</code>——一个短小、纳入版本控制的文件，声明要什么、为什么要、在什么约束下——并在一次与 Claude 的工作会话内把它变成需求与设计规格</li>
+        <li>把机构知识维护为纳入版本控制、机器可读的 <code class="inline-code">CLAUDE.md</code> 文件与 skills</li>
+        <li>在实现过程中穿插持续 evals，配合分层的 agent 评审，把人工评审留给受监管代码与关键代码</li>
+        <li>在 AI 行动的当刻强制治理，用 hooks 作为审批门禁，并把被突破的控制带写回为新的 <code class="inline-code">intent.md</code> 以闭环</li>
+      </ul>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>课程结构（6 阶段 + 首尾）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>阶段</th><th>课</th><th>中文课题</th><th>URL 尾段</th></tr></thead>
+          <tbody>
+            <tr><td>引言</td><td>Introduction</td><td>引言</td><td><code>introduction</code></td></tr>
+            <tr><td>Stage 1: Plan</td><td>Capture as intent.md</td><td>捕获为 intent.md</td><td><code>capture-intent</code></td></tr>
+            <tr><td>Stage 2: Design</td><td>Requirements and design</td><td>需求与设计</td><td><code>requirements-and-design</code></td></tr>
+            <tr><td>Stage 3: Build</td><td>Claude Code plan mode as the default starting point</td><td>以 plan mode 作为默认起点</td><td><code>plan-mode</code></td></tr>
+            <tr><td>Stage 3: Build</td><td>The CLAUDE.md</td><td>CLAUDE.md</td><td><code>claude-md</code></td></tr>
+            <tr><td>Stage 3: Build</td><td>Skills as institutional knowledge</td><td>用 skills 承载机构知识</td><td><code>skills-as-institutional-knowledge</code></td></tr>
+            <tr><td>Stage 3: Build</td><td>Parallel sessions and subagents</td><td>并行会话与子代理</td><td><code>parallel-sessions-and-subagents</code></td></tr>
+            <tr><td>Stage 4: Test</td><td>Give Claude a feedback loop</td><td>给 Claude 一个反馈闭环</td><td><code>give-claude-a-feedback-loop</code></td></tr>
+            <tr><td>Stage 4: Test</td><td>Continuous evals in CI</td><td>在 CI 中持续跑 evals</td><td><code>continuous-evals-in-ci</code></td></tr>
+            <tr><td>Stage 5: Deploy</td><td>AI in the PR review loop</td><td>让 AI 进入 PR 评审闭环</td><td><code>ai-in-the-pr-review-loop</code></td></tr>
+            <tr><td>Stage 5: Deploy</td><td>Hooks as approval gates</td><td>用 hooks 作为审批门禁</td><td><code>hooks-as-approval-gates</code></td></tr>
+            <tr><td>Stage 5: Deploy</td><td>CI/CD integration and deployment</td><td>CI/CD 集成与部署</td><td><code>ci-cd-integration-and-deployment</code></td></tr>
+            <tr><td>Stage 6: Maintain</td><td>Closing the loop on metrics</td><td>用指标闭合整个循环</td><td><code>closing-the-loop-on-metrics</code></td></tr>
+            <tr><td>结语</td><td>Closing thoughts and resources</td><td>结语与资源</td><td><code>closing-thoughts-and-resources</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>每个 play 固定五段结构：<strong>发生了什么变化</strong> / <strong>上手准备</strong> / <strong>怎么执行</strong>（含「长什么样」示例）/ <strong>治理考量</strong> / <strong>怎么度量</strong>（领先指标 + 滞后指标）。</p>
+    </section>
+
+    <!-- ============ 第 1 课 ============ -->
+    <section id="lesson-1">
+      <span class="stage-badge">引言</span>
+      <h2><span class="num">01</span>引言</h2>
+      <p class="section-lead">各组织已经开始用 AI 以一年前无法想象的速度写代码，然而围绕代码的那些流程并没有以同等速度改变。</p>
+      <p>许多工程团队仍在沿用原来那套审批门禁、评审、交接和策略，这拖住了使用 Claude Code 这类 agent 化编码方案本应带来的生产力提升。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>传统 SDLC</h3>
+      <p>软件开发生命周期（SDLC）是把软件从想法送到生产环境的那套流程。多数组织跑的都是同样六个阶段的某个版本，覆盖规划、设计、构建、测试、部署与维护。传统做法下，每个阶段都是一个独立环节，由不同角色负责：产品经理写需求，技术架构师把需求转成设计，工程师实现设计，受监管企业里的 QA 团队验证软件，发布团队把它上线，运维监控在跑的东西。工作通过文档、工单和签署确认在各环节之间流转。</p>
+      <p>传统 SDLC 流程厚重，目的是确保每一步都有问责和管控。但传统 SDLC 是为这样一个时代设计的：最耗时、最昂贵的阶段是编写和实现代码——而今天已不再如此。产品需求文档（PRD）、估点仪式、产品安全评审，这些都是为了在可能长达数周、数月甚至数季度的开发工作中强行对齐而存在的。</p>
+      <p>传统 SDLC 还有一个特征：它的控制项假定每一步都由人来做。产出价值最高的那些组织，已经围绕 agent 化 AI 如今的能力重建了自己的流程，同时确保人始终在闭环之中。在本手册中，我们逐一介绍我们 Applied AI 团队在 SDLC 各阶段内部集成 Claude 的若干最佳实践，用以加速开发、让流程跑得更快——这些实践源自我们与客户合作的经验。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>当代码不再是瓶颈</h3>
+      <p>当代码不再是瓶颈、构建阶段跑得比传统 SDLC 所能容纳的更快时，三件事随之成立：</p>
+      <ol class="steps">
+        <li>瓶颈转移到构建阶段两侧的环节——主要是规划、评审/测试和部署，它们仍以人的速度运行。</li>
+        <li>控制项不再匹配现实，变得难以为继。当代码由人写时，逐行手工评审是合理的；一旦 agent 写掉大部分 diff，这种做法就跟不上了。</li>
+        <li>治理成本上升，因为例外情况仍要走每周或每月才开一次的会议和委员会。</li>
+      </ol>
+      <div class="figure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div>配图说明：瓶颈发生了转移——构建阶段收缩到 agent 的速度，而它周围的阶段仍以人的速度运行。</div>
+      </div>
+      <p>拿安全瓶颈举例。安全团队的人员编制是按人的产出规模来定的，所以当 agent 把代码产出翻倍时，要么评审队列堆积，要么代码在评审不足的状态下上线。受监管的组织两个结果都不能接受，因此它的安全与策略检查必须跟上 agent 的节奏。</p>
+      <p>要更好地兑现 agent 化 AI 的生产力收益并保障其安全，传统 SDLC 需要经历与实现阶段同等程度的转型。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v6h-6"/></svg>什么是 AI 原生 SDLC</h3>
+      <p>AI 原生 SDLC 是一套重新构想的流程，它把原有的控制目标与新的强制手段结合起来。流程不再是线性流转，而是变成一个循环，AI 嵌入其中每一个环节。AI 原生 SDLC 推动自动化的交接与后续 play 的自动触发，从而缓解传统 SDLC 各阶段之间手工、笨重的交接问题。</p>
+      <div class="figure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div>配图说明：左侧是传统线性 SDLC，右侧是 AI 原生的连续循环，人位于循环之上，负责发起、指挥和治理。</div>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>转变</h3>
+      <p>下表列出的是传统 SDLC 与由 Claude 支撑的 AI 原生 SDLC 两端的形态。多数组织处在两栏之间的某个位置。</p>
+      <div class="table-wrap">
+        <table class="shift-table">
+          <thead><tr><th>阶段</th><th>传统 SDLC</th><th>AI 原生 SDLC</th></tr></thead>
+          <tbody>
+            <tr><td><b>规划</b></td><td>需求由委员会收集，经工作坊和签署确认层层提炼，再由人手工写成文档</td><td>Claude 直接从源头综合出痛点，并把它们捕获进 <code>intent.md</code>——该文件既人类可读，又机器可执行</td></tr>
+            <tr><td><b>设计</b></td><td>规格由分析师撰写，再由设计师解析</td><td>需求与设计压缩进与 agent 的一次工作会话，由编码为 skills 的标准引导，纳入 Git 版本管理</td></tr>
+            <tr><td><b>构建</b></td><td>测试与代码由人手写，文档在主要开发工作完成之后才补</td><td>测试与代码由 AI 生成，机构知识以纳入版本控制、机器可读的 <code>CLAUDE.md</code> 文件和 skills 形式维护</td></tr>
+            <tr><td><b>测试</b></td><td>QA 门禁设在阶段边界上</td><td>持续 evals 穿插在整个实现过程中</td></tr>
+            <tr><td><b>部署</b></td><td>人评审每一行代码，治理发生在评审周期里，且常常不一致</td><td>分层的 agent 评审，人工评审留给受监管代码与关键代码。治理在 AI 行动的当刻强制执行，用 hooks 作为审批门禁</td></tr>
+            <tr><td><b>维护</b></td><td>人盯着生产环境找 bug</td><td>agent 监控线上部署。任何被突破的控制带都会被诊断，并作为新的 <code>intent.md</code> 写回循环</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>把 AI 原生这一栏串起来的，是<strong>已提交产物</strong>。每个阶段都以向版本控制写入一份产物结束（包括 <code class="inline-code">intent.md</code>、<code class="inline-code">spec.md</code>、<code class="inline-code">plan.md</code>、diff 及其测试、带评审发现项的 PR，以及事件记录），下一个阶段则以读取它开始。在早期阶段，产物以 <code class="inline-code">.md</code> 文件为主，因为产品负责人和 agent 都能读懂并作用于同一个文件。从构建阶段起，产物变成代码及其记录。这条提交链同时也是审计轨迹：谁提出了什么要求、agent 产出了什么、谁批准了它。</p>
+      <div class="insight success">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 6 9.4"/></svg></div>
+        <div><b>人对每一个需要判断的决定仍然负责</b><p>在 agent 化的 SDLC 世界里，人的注意力随着必须被评审的产物一起转移。</p></div>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>play 如何运作</h3>
+      <p>play 是本手册的核心，被归入六个非线性阶段（规划、设计、构建、测试、部署、维护），合起来覆盖完整生命周期。每个 play 覆盖：</p>
+      <ul>
+        <li>发生了什么变化</li>
+        <li>上手准备</li>
+        <li>落地的具体步骤</li>
+        <li>治理考量</li>
+        <li>如何度量它是否奏效</li>
+      </ul>
+      <p>各 play 是模块化的，组织可以根据自身需要，在不同时期优先转型不同阶段。每个 play 在「前置条件」下声明自己的依赖，依赖关系图对此有进一步说明。</p>
+      <p>一个阶段以提交一份产物结束，而这次提交就启动下一个阶段。被接受的 <code class="inline-code">intent.md</code> 触发需求与设计环节，获批的 <code class="inline-code">spec.md</code> 触发 plan mode，合入的 PR 触发流水线，生产环境中被突破的控制带写出下一份 <code class="inline-code">intent.md</code>——循环由此继续。</p>
+      <div class="stage-flow">
+        <span class="sf"><b>规划</b><code>intent.md</code></span><span class="arrow">→</span>
+        <span class="sf"><b>设计</b><code>spec.md</code></span><span class="arrow">→</span>
+        <span class="sf"><b>构建</b><code>plan.md</code> + diff</span><span class="arrow">→</span>
+        <span class="sf"><b>测试</b><code>evals</code></span><span class="arrow">→</span>
+        <span class="sf"><b>部署</b>PR + hooks</span><span class="arrow">→</span>
+        <span class="sf"><b>维护</b>控制带突破</span><span class="arrow">↻</span>
+      </div>
+      <p>起初你需要手工提示每一步；终态则是一个循环：每份被接受的产物都点燃下一道门禁。人的注意力集中在门禁处，评审 agent 标记出来的东西，而不是从零开始每个阶段。</p>
+      <div class="figure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div>配图说明：play 依赖关系图。顶行的 play 没有前置条件；实线箭头指向建立在它之上的 play，虚线箭头表示有帮助但非必需。</div>
+      </div>
+      <p>依赖关系（12 个 play、14 条边，其中 3 条虚线）：</p>
+      <ul>
+        <li><strong>第 1 行，无前置条件</strong>：Capture intent、CLAUDE.md、Skills、Feedback loop、Hooks、Plan mode</li>
+        <li><strong>第 2 行</strong>：Subagents（需要 CLAUDE.md；反馈闭环有帮助）、Evals（需要 CLAUDE.md 和反馈闭环）</li>
+        <li><strong>第 3 行</strong>：Requirements and design（需要 Capture intent 和 Skills）、PR review（需要 Evals 和 Subagents；Skills 有帮助）</li>
+        <li><strong>第 4 行</strong>：CI/CD（需要 PR review 和 Hooks）</li>
+        <li><strong>第 5 行</strong>：Closing the loop（需要 CI/CD 和 Capture intent）</li>
+        <li>CLAUDE.md 对 Skills 有帮助，但非必需</li>
+      </ul>
+      <p>该图的代码复刻件见源文档同目录 <code class="inline-code">assets/play-dependency-graph.excalidraw</code> 与 <code class="inline-code">assets/play-dependency-graph.svg</code>。</p>
+    </section>
+
+    <!-- ============ 第 2 课 ============ -->
+    <section id="lesson-2">
+      <span class="stage-badge">Stage 1 规划</span>
+      <h2><span class="num">02</span>捕获为 intent.md</h2>
+      <p class="section-lead"><code class="inline-code">intent.md</code> 启动整个软件开发流程，它可以由不同路径进入：有人有了一个想法、有人提了一张工单，或者某个事件通过告警被暴露出来（<strong>见 Stage 6 维护</strong>）。</p>
+      <p>当一个人有了想法时，他与 Claude 一起头脑风暴，产出一份 Markdown 原型规格。而在传统 SDLC 里，同一个人接下来还必须说服产品团队的某位成员，与他一起、或者代他把这个想法写成文档。</p>
+      <p>Claude 生成的这份原型规格人类可读、纳入版本控制，且下一个阶段可以立即消费。它以 <code class="inline-code">intent.md</code> 的形式保存。</p>
+      <p>无论 intent 源自事件触发还是源自某个人，步骤都相同：产品负责人在它被提交之前，评审并修正这份由 agent 撰写的 <code class="inline-code">intent.md</code>。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>一个想法要先经过待办条目、用户故事、故事点和细化会议，才有人能对它动手。每次交接都发生一次归属权转移，所以最终到达工程团队的东西，与提出者原本的意思已经隔了好几层。</td>
+              <td>提出者与 Claude 头脑风暴，把结果写成 <code>intent.md</code>——一份用提出者自己的话写成的原型规格。该产物包含要什么、为什么要、在什么约束下。重复性流程则编码为 skills。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span class="none">前置条件：无</span></div>
+        <p><strong>基础设施</strong>：为非工程人员提供的 Claude 访问权限（claude.ai 或 Cowork）；一份约定好的 <code class="inline-code">intent.md</code> 模板；一个共享的、纳入版本控制的 intent 存放处，由产品负责人关注。对单一产品而言，最简单的存放处就是产品仓库里的一个 <code class="inline-code">intent/</code> 目录。这样安排能让产物链紧邻由它派生出的代码。只有当 intent 横跨多个仓库时，专设一个 intent 仓库才值得那份额外开销；在 monorepo 里它就是一个目录。<strong>Stage 3 构建</strong>中的「遗留系统」一节讲了这个存放处与已经持有记录的 Jira 或需求管理工具之间的关系。</p>
+        <p>搭建这套东西对平台团队或工程团队是一次性任务。需要一位技术团队成员把 intent 存放处立起来，并决定谁有写入权限，因为贡献者会来自整个组织。</p>
+        <p>仓库一旦存在，没有 Git 经验的贡献者并不需要直接使用 Git。取而代之的是：一个连到版本控制系统（例如 GitHub）的连接器，让 Claude 能从 claude.ai 或 Cowork 代他们提交 Markdown 文件。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>提出者用自己的话向 Claude 描述问题。他可以描述今天做不到什么、这个想法影响到谁、更好的状态是什么样、什么不在范围内。不需要任何正式语言。</li>
+          <li>头脑风暴，直到想法变得具体。Claude 会问一位分析师会问的那些问题：范围、用户、约束，以及成功长什么样。</li>
+          <li>请 Claude 按组织的模板把结果写成 <code class="inline-code">intent.md</code>。该模板可以编码为一个 skill，由技术团队成员搭建、由负责人签署确认，内容可涵盖问题、期望结果、受影响的用户与系统、约束，以及待解决的问题。</li>
+          <li>提出者修正 Claude 理解错的任何地方。</li>
+          <li>把 <code class="inline-code">intent.md</code> 提交到共享存放处。作者和时间戳随之进入记录，产品负责人从这里接手这个想法。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">intent.md</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">markdown &middot; intent.md</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre># Intent: claims status self-service
+Author: J. Ortiz (claims operations). Status: draft.
+## Problem
+Customers phone the contact center to ask where their claim is.
+Handlers spend roughly a third of call time on status-only queries.
+## Proposed outcome
+Customers see claim status, next step and expected date in the portal.
+## Affected users and systems
+Claims handlers, portal team, claims-core API.
+## Constraints
+No new PII in the portal session. Existing authentication only.
+## Open questions
+Do third-party loss adjusters need access too?</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>证据就是那份已提交的 <code class="inline-code">intent.md</code>，它记录了作者、时间戳和完整修订历史，并留痕在 intent 存放处的 Git 历史里。产品负责人批准；把该 intent 送入 <strong>Stage 2 设计</strong> 的接受或拒绝决定，则以合入或关闭评审的形式被记录下来。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>从第一次对话到 <code class="inline-code">intent.md</code> 被提交所花的时间，从 intent 存放处的 Git 历史读取（其中记录了作者与时间戳）。预期是从长达数周的需求获取与细化周期降到数小时。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>存活率，即产品负责人接受进入 <strong>Stage 2 设计</strong>（而非关闭）的 <code class="inline-code">intent.md</code> 占比。接受或拒绝的决定以产物被合入或评审被关闭的形式记录。此外，统计同一变更在首个 <code class="inline-code">spec.md</code> 提交之后对 <code class="inline-code">intent.md</code> 所做的改动次数。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 3 课 ============ -->
+    <section id="lesson-3">
+      <span class="stage-badge">Stage 2 设计</span>
+      <h2><span class="num">03</span>需求与设计</h2>
+      <p class="section-lead">产品负责人一旦批准了 <code class="inline-code">intent.md</code>，Claude 就取用它并产出一份需求与设计规格。这个过程由组织在品牌、安全、合规和 UX 方面的 skills 引导。</p>
+      <p>产品负责人评审这份规格，但不撰写它。这个流程的目标是产出一份工程团队可以据以规划的规格，其中标记出了需要关注的地方。</p>
+      <p>前端工作是最清晰的例子。<code class="inline-code">intent.md</code> 一旦被接受，产品负责人就依据它在 Claude Design（beta）里把设计稿做出来，在稿子上迭代，然后导出给 Claude Code 去实现。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>需求和设计是由不同团队负责的两个独立环节。分析师把想法形式化为需求，设计师再把需求反向解析成设计。这种分离是为了问责而存在的，但它既慢又有损耗。</td>
+              <td>两个环节在一次被提示的会话内完成。Claude 取用 <code>intent.md</code>，产出一份需求与设计规格，受组织的 skills 约束，并标记出需要关注的地方。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span>前置条件：写好一份 <code class="inline-code">intent.md</code></span><span>品牌 / 安全 / 合规 / UX 策略已写成 skills</span></div>
+        <p><strong>基础设施</strong>：一位拥有 Claude 访问权限的产品负责人。不需要工程技能。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>产品负责人开启一个会话，其中组织的 skills 可用，并附上 <code class="inline-code">intent.md</code>。</li>
+          <li>产品负责人的提示词指向该 intent、点明各项约束、并要求标记出关注点。一开始手工跑；随后把它固化为一个组织级的斜杠命令。再往后，把 intent 存放处中 <code class="inline-code">intent.md</code> 被接受这一动作设为触发器：一个非交互作业在合入时触发，加载组织的 skills 跑完这一环节，并以拉取请求的形式提交 <code class="inline-code">spec.md</code>（<strong>Stage 5 部署</strong> 中的 CI/CD play 讲了这套管路）。从那时起，产品负责人第一次介入就是评审。</li>
+          <li>同一位产品负责人对照原始想法评审这份规格。规格是否解决了所陈述的问题？<code class="inline-code">intent.md</code> 中那些待解决的问题是被回答了，还是被延续下去了？</li>
+          <li>优先处理被标记出来的关注点，因为那些正是一位分析师本会向上升级的地方。产品负责人在工程团队看到规格之前，与各自的策略责任人逐一解决它们。</li>
+          <li>把 <code class="inline-code">spec.md</code> 与 <code class="inline-code">intent.md</code> 并排提交。这一对文件记录下了「当初要求什么」和「最终决定了什么」。</li>
+          <li>产品负责人决定这份规格和 intent 是否进入构建阶段，对组织认定为较高风险的任何事项则咨询技术负责人。这个决定始终由人类同事来做；而接受该规格，正是启动 <strong>Stage 3 构建</strong> 中 plan mode play 的动作。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p>提示词：</p>
+        <div class="codesnippet">
+          <span class="code-lang">prompt</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>Read the attached intent.md and produce a requirements and design spec
+for integrating it into our existing codebase. Apply the skills available
+to you so the plan conforms to our brand guidelines, security policies
+and UX standards. Document the spec fully as spec.md, ready to hand to
+the engineering team. Describe clearly any areas of concern, especially
+where you cannot satisfy contradicting policies.</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>策略冲突不再是数周后在某次评审中才被发现，而是在规格被撰写的当刻就读取并应用了当下生效的策略。组织的 skills 作为约束施加在规格之上。规格本身、产出它的提示词，以及当时生效的 skill 版本，全部留痕在版本控制中。产品负责人对规格签署确认，并把被标记的关注点路由给指定的策略责任人。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>同一变更的 <code class="inline-code">intent.md</code> 提交与 <code class="inline-code">spec.md</code> 提交之间的耗时（两个 Git 时间戳之差），与原先「需求 + 设计」周期作对比。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>构建启动之后的需求返工量。统计同一变更中日期晚于首个 <code class="inline-code">plan.md</code> 提交的 <code class="inline-code">spec.md</code> 提交数。<code class="inline-code">git log</code> 可以直接给出这个数字。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 4 课 ============ -->
+    <section id="lesson-4">
+      <span class="stage-badge">Stage 3 构建</span>
+      <h2><span class="num">04</span>以 Claude Code 的 plan mode 作为默认起点</h2>
+      <p class="section-lead">工程师在 plan mode 下启动 Claude Code 会话，把 <strong>Stage 2 设计</strong> 阶段获批的 <code class="inline-code">spec.md</code> 交给 Claude，让它反过来访谈自己，在计划上反复迭代直到满意。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>工程师读完设计就开始写代码。这次变更具体怎么做——细到改哪些文件、写哪些测试——留在工程师脑子里，最好的情况也只是留在某条工单评论里。没有别人能评审它。评审者看到的第一样东西是成型的 diff，而到那时返工已经很慢了。</td>
+              <td>工作从一份书面计划开始，由 Claude 在 plan mode 下产出——该模式下它能读代码库但不做任何改动。工程师在代码被写出来之前修正计划，获批的版本作为 <code>plan.md</code> 提交，供后续阶段据以核对。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span>前置条件：如果已有 intent 产物（<code class="inline-code">intent.md</code> 或 <code class="inline-code">spec.md</code>）则用上它</span><span><code class="inline-code">CLAUDE.md</code> 文件也有帮助</span></div>
+        <p><strong>基础设施</strong>：拥有该仓库访问权限的 Claude Code。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>工程师在 plan mode 下与 Claude 开启会话。</li>
+          <li>工程师把 <code class="inline-code">intent.md</code> 和 <code class="inline-code">spec.md</code> 交给 Claude，要求一份实现计划，其中点明会改动哪些文件、工作的先后顺序，以及能证明它成立的那些测试。</li>
+          <li>拷问这份计划：问这次变更可能弄坏什么、哪一步风险最高、Claude 考虑过但选择不做的其他方案有哪些。</li>
+          <li>反复迭代，直到一位从未看过这段对话的工程师，仅凭这份计划就能实现该变更。</li>
+          <li>把获批的计划作为 <code class="inline-code">plan.md</code> 提交。该计划加入审计轨迹，而 PR 评审 play（<strong>Stage 5 部署</strong>）会拿最终的 diff 与它核对。</li>
+          <li>接受计划，让 Claude 去实现。有一份扎实的计划，实现往往一遍就过。</li>
+          <li>当实现偏离了计划时，在同一次提交中更新 <code class="inline-code">plan.md</code>。可以考虑用一个 hook 来强制两者保持同步。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">plan.md</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">markdown &middot; plan.md</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre># Plan: claims status self-service (from intent.md 2026-06-02)
+
+## Files that change
+
+portal/src/claims/StatusPanel.tsx (new), claims-api/routes/status.py, claims-api/tests/test_status.py
+
+## Order of work
+
+1. Add the status endpoint behind existing auth.
+2. Panel against the endpoint.
+3. Wire into the portal nav.
+
+## Risks
+
+The claims-core API rate-limits at 50 rps; the panel must cache.
+
+## Proof
+
+test_status.py covers the four claim states; screenshot matches the approved mock.</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>设计评审发生在任何代码被生成之前——那时改变方向还只是编辑一份文档的事。plan mode 自身就强制了这一点，因为在工程师接受计划之前，Claude 无法编辑文件。计划及其各次修订，连同是谁接受了它，一并留痕。常规变更由工程师批准；组织认定为较高风险的任何事项则交给技术主管或架构师。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>一次实现即合入的变更占比，以及从计划获批到 PR 合入的时间（所需数据都在 PR 元数据里）。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>每个变更的返工轮次（同样取自 PR 元数据），以及合入的 diff 仍与已提交的 <code class="inline-code">plan.md</code> 相符的频率。</p>
+          </div>
+        </div>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Claude Code 的 auto mode</h3>
+      <p>Claude Code 也可以在 auto mode 下运行：工程师迭代并批准计划，随后 Claude 逐项应用每处改动，不再逐次编辑都来征求许可。随着后续各 play 带来的护栏成熟起来（调优过的 <code class="inline-code">CLAUDE.md</code>、把策略编码进去的 skills、拦截不安全动作的 hooks，以及一套 Claude 能自己跑的测试），auto mode 会成为常规工作的默认模式：一份严谨的 <code class="inline-code">spec.md</code>、一个小的影响面，以及已被测试覆盖的代码。</p>
+      <p>这个转变的方向，是从「用户盯着 agent 逐个做编辑并评审这些动作」，转向「在较长的自主会话之后评审产物」。auto mode 配合 worktrees 使用时，还能进一步支撑个人与团队层面的并行，并且是自主运行 SDLC、闭合循环（如 <strong>Stage 6 维护</strong> 所述）的基础。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>遗留系统与事实来源</h3>
+      <p>现有的 SDLC 流程很可能已经在追踪各类产物了，只是没有以 Markdown 文件的形式。工作项可能在 Jira 里，需求在某个内置了合规可追溯性的工具里，设计在 Figma 里，变更审批在某个变更委员会那里。这些系统很难被取代，因为审计师和监管方已经接受了它们，并且其他团队依赖它们——所以 AI 原生 SDLC 必须适配既有现实。对流程产出的每一类产物，应当指定其中一个系统为事实来源，其余系统持有副本或链接。</p>
+      <p>以下几种配置都能做到「只有一个事实来源」，而具体选哪种可以因产物而异：</p>
+      <ul>
+        <li><strong>以仓库为事实来源。</strong> Markdown 产物是权威记录，遗留系统在提交中引用这些文件。对工程主导的组织，这可能是最干净的配置之一，因为所有记录都活在一个工具里、只有一个时间戳权威。</li>
+        <li><strong>以遗留系统为事实来源。</strong> Jira、ServiceNow 或需求管理工具持有权威记录，Markdown 产物是工作副本。Claude 在会话开始时读取该记录，并在产出规格或计划的同一个会话内，通过 Model Context Protocol（MCP）连接器把结果写回去。</li>
+        <li><strong>以建立链接为最低标准。</strong> 所有产物都记下记录 ID，所有遗留记录都包含对应 Markdown 文件的提交 SHA。当存在两个事实来源时，链接这一选项是转向 AI 原生 SDLC 的一个好起点。</li>
+      </ul>
+      <p>只要两者之间存在链接，或者其中一个被宣告为事实来源，遗留系统与 AI 原生的 Markdown 优先体系就可以共存。</p>
+    </section>
+
+    <!-- ============ 第 5 课 ============ -->
+    <section id="lesson-5">
+      <span class="stage-badge">Stage 3 构建</span>
+      <h2><span class="num">05</span>CLAUDE.md</h2>
+      <p class="section-lead"><code class="inline-code">CLAUDE.md</code> 把一位新人所需的上下文交给 Claude，涵盖约定、命令、架构，以及团队最常遇到的那些错误。原本存在于人脑中和 wiki 上的知识，变成一个 agent 在每次会话开始时都会读取的文件，由整个团队共同维护，每犯一次错就迭代一次。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span class="none">前置条件：无</span></div>
+        <p><strong>基础设施</strong>：一个仓库、已安装的 Claude Code，以及一位熟悉该代码库的工程师。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>在仓库里运行 <code class="inline-code">/init</code>。Claude 会依据它发现的内容生成一份初始 <code class="inline-code">CLAUDE.md</code>。</li>
+          <li>把生成的文件削减到「一位新人第一天所需」的程度。保留构建、测试和 lint 命令，真正重要的那些约定，以及 Claude 反复搞错的那些点。</li>
+          <li>把 <code class="inline-code">CLAUDE.md</code> 提交到 Git 的仓库根目录，这样整个团队共用同一个版本，对它的改动会像代码一样被评审。</li>
+          <li>有一条实操规则很有用：当 Claude 第二次犯同一个错误时，把纠正写进 <code class="inline-code">CLAUDE.md</code>。</li>
+          <li>把它控制在一页以内，因为 Claude 在会话开始时会读完全文，任何过时内容都在白占上下文而不带来任何收益。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">CLAUDE.md</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">markdown &middot; CLAUDE.md</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre># Payments service
+## Commands
+- Build: make build
+- Test: make test (unit), make itest (integration, needs docker)
+- Lint: make lint (runs in CI; fix before pushing)
+## Conventions
+- Java 21, Spring Boot 3. No new Lombok.
+- Money is always BigDecimal, never double.
+- Every endpoint needs an integration test in src/itest.
+## Architecture
+- api/ holds REST controllers, core/ holds domain logic,
+  adapters/ talks to external systems.
+- Kafka events are defined in schemas/; never edit generated classes.
+## Things Claude gets wrong
+- Do not bump dependency versions; the platform team owns them.
+- The legacy v1/ package is frozen; changes go in v2/.</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p><code class="inline-code">CLAUDE.md</code> 纳入版本控制，因此 agent 所遵循的指令是可评审、可审计的。团队约定通过该文件生效，对它的改动留痕在 Git 历史里，代码所有者在 PR 评审中批准这些改动。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>Claude 重复犯本该被 <code class="inline-code">CLAUDE.md</code> 拦住的错误的频率。对 <code class="inline-code">CLAUDE.md</code> 的纠正或改动应当在 Git 历史中被追踪。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>团队新成员从加入到首个 PR 合入的时间，取自 PR 历史。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 6 课 ============ -->
+    <section id="lesson-6">
+      <span class="stage-badge">Stage 3 构建</span>
+      <h2><span class="num">06</span>用 skills 承载机构知识</h2>
+      <p class="section-lead">skills 是组织把机构知识变得可操作的方式。其中的指令是显式的、纳入版本控制的、被广泛应用的，并在策略变更时集中更新。</p>
+      <div class="insight">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div><b>经验法则</b><p><strong>必须被一致应用的机构知识，写成 skill；属于 <code class="inline-code">CLAUDE.md</code> 或提示词的那些成分，不要写成 skill。</strong></p></div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span class="none">前置条件：无硬性要求</span><span>有 <code class="inline-code">CLAUDE.md</code> 会有帮助，但 skill 并不依赖它</span></div>
+        <p>有 <code class="inline-code">CLAUDE.md</code> 会有帮助，因为它把 agent 的工作知识留在仓库里，但 skill 并不依赖它。</p>
+        <p><strong>基础设施</strong>：一条有指定责任人、且有书面事实来源的策略。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>挑一项今天执行得不一致的知识。可以是一条安全标准、一项 API 设计约定，或者一条品牌规则。</li>
+          <li>把它写成一个 skill——一个包含 <code class="inline-code">SKILL.md</code> 的目录，其 frontmatter 声明何时触发，正文声明要做什么。由工程师依据策略责任人的事实来源撰写，可借助 Claude。</li>
+          <li>把该 skill 放在仓库的 <code class="inline-code">.claude/skills/&lt;name&gt;/</code> 下，使它随代码一起分发；或者通过插件在全组织范围分发。</li>
+          <li>测试该 skill 会被触发。用不同的问法请 Claude 做相关任务，确认每次它都加载了该 skill。</li>
+          <li>当策略发生变更时，改这个 skill，并让策略责任人对该改动签署确认。</li>
+          <li>工程师在下一次会话中自动获得新版本。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">.claude/skills/secure-api-review/SKILL.md</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">markdown &middot; SKILL.md</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>---
+name: secure-api-review
+description: Apply the API security standard. Use whenever creating or
+  modifying an external-facing endpoint, reviewing API code, or
+  generating an OpenAPI spec.
+---
+# Secure API review
+When you create or change an API endpoint:
+1. Authentication: every endpoint requires the gateway JWT;
+   no anonymous routes outside /health.
+2. Input validation: validate request bodies against the OpenAPI
+   schema and reject unknown fields.
+3. Audit: every state-changing endpoint emits an audit event with
+   actor, action, entity and timestamp.
+4. Data classification: fields tagged pii in the schema must never
+   appear in logs or error messages.
+Run scripts/check-endpoints.sh and include its output in your summary.</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>skill 是一项控制项，但属于<strong>建议性控制</strong>。它让 Claude 在代码被撰写的当刻很可能应用该策略，但没有任何机制强制某次会话必须遵守它。一条必须始终成立的策略，背后需要某种确定性手段来托底，比如一个拦截该动作的 hook，或者在 PR 处重新核查该策略的一道评审环节。</p>
+        <div class="insight warn">
+          <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div><b>skill 让违规变得罕见，hook 让违规接近不可能。</b><p>skill 的调用留痕在会话轨迹里，策略责任人像评审代码那样评审 skill 的改动。</p></div>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>从策略责任人批准某项策略变更，到更新后的 skill 被合入所花的时间，取自该 skill 目录上的 PR。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>引用了该策略的 PR 评审发现项数量。一旦 skill 在代码被撰写的当刻就在应用该策略，这个数字应当趋近于零。若它没有趋近于零，那么要么该 skill 没有被触发，要么它的文本已经偏离了正式策略。</p>
+          </div>
+        </div>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>hooks 作为构建期护栏</h3>
+      <p>skill 是建议性控制，而 hook 是它背后的<strong>确定性层</strong>。Claude 的大部分动作是实现过程中的文件编辑与 shell 命令，所以构建阶段往往是 hooks 触发最频繁的地方。</p>
+      <p>构建期 hooks 可以：</p>
+      <ul>
+        <li>拦截对受保护路径的编辑，例如生成的类文件或某个已冻结的包</li>
+        <li>在文件编辑之后运行格式化器和 linter，使偏移永不累积</li>
+        <li>让凭据不进入 diff</li>
+        <li>为任何必须无例外成立的 skill 策略托底</li>
+      </ul>
+      <p>hook 会在每一个匹配它的动作上运行，因此构建期 hooks 应当快速，且作用范围限定在发生改动的那个文件上。更重的检查（例如整套测试）应放在提交处或 PR 处。</p>
+      <p>那种要求人来批准的 hook，属于 <strong>Stage 5 部署</strong> 里的门禁，因为在构建过程中弹出审批提示，等于把一个人重新放回所有并行会话的关键路径上。</p>
+    </section>
+
+    <!-- ============ 第 7 课 ============ -->
+    <section id="lesson-7">
+      <span class="stage-badge">Stage 3 构建</span>
+      <h2><span class="num">07</span>并行会话与子代理</h2>
+      <p class="section-lead">一位工程师可以同时驱动多条工作流。</p>
+      <p><strong>并行会话</strong>是另一个完整的 Claude Code 实例，在它自己的 Git worktree 里处理一个独立任务。各个独立会话彼此毫不知情，它们唯一共享的东西就是那位在操控它们的工程师。</p>
+      <p><strong>子代理</strong>运行在单个会话内部，是一个作用范围受限的助手，拥有自己的上下文窗口和工具限制，适合那些在多个任务中反复出现的活儿，例如验证应用是否按预期运行。</p>
+      <p>并行会话提高了一位工程师能同时推进的任务数量，而子代理让每个会话专注于它自己的任务。工程师的工作是操控并评审它们全部。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>一位工程师一次做一个任务，并把一天/一周中相当一部分时间花在构建、测试和评审上。等待期间切换到别的任务是可行的，但上下文切换足够累人，以至于很少有人愿意这么做。</td>
+              <td>一位工程师同时运行多个 Claude 会话，每个都在自己的 worktree 里做自己的任务。反复出现的活儿变成子代理，各有自己的上下文和工具限制。工程师的工作转向编排，并最终转向构建与监控各种循环。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span>前置条件：<code class="inline-code">CLAUDE.md</code>（所有会话都会读取）</span><span>反馈闭环（Stage 4 测试）有帮助</span></div>
+        <p>反馈闭环（<strong>Stage 4 测试</strong>）在这里也有帮助，因为当一个会话能验证自己的工作时，工程师需要的监督就更少。</p>
+        <p><strong>基础设施</strong>：一个 Git 仓库，因为隔离性来自 worktrees；以及调优过的权限设置，使会话不会因为组织认为安全的命令而卡在审批提示上。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>工程师把工作拆成触及不同文件的任务，借助 plan mode play（<strong>Stage 3 构建</strong>）产出的计划来看清哪些工作是相互独立的。共享文件的任务放在同一个会话里，一个接一个地做。</li>
+          <li>每个并行任务分到它自己的 worktree，例如在一个终端里 <code class="inline-code">claude --worktree feature-auth</code>，在另一个终端里 <code class="inline-code">claude --worktree fix-rate-limit</code>。worktree 是一份独立的检出，位于自己的分支上，这能阻止会话之间在文件上相互碰撞。</li>
+          <li>两三个会话是一个合理的起点。实际上限是一个人能否妥善评审这么多条流，所以只在评审跟得上的前提下增加会话数。</li>
+          <li>把反复出现的活儿变成子代理，以 Markdown 文件定义在 <code class="inline-code">.claude/agents/</code> 中，每个都有名字、何时使用它的说明，以及它可以触及的工具。例子包括：一个在主 agent 完成后剥离多余复杂度的代码精简器；一个运行应用并检查行为的验证器；一个探索代码库并回报结论、而不把主上下文淹掉的调研器。把这些定义提交到 Git，使整个团队共用它们。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">.claude/agents/verifier.md</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">markdown &middot; verifier.md</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>---
+name: verifier
+description: Runs the app and checks the change works before the session reports done
+tools: Bash, Read
+---
+Start the app with make run. Exercise the changed behavior and the two
+nearest neighboring flows. Report what you ran, what you saw, and any
+behavior that does not match plan.md. Do not fix anything; report only.</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>会话更多意味着产出更多，所以控制项必须来自仓库里的配置。仓库中的 hooks 和权限设置对所有会话生效，而某个会话做了什么会被记录，并归属到运行它的那位工程师名下。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>在评审质量得以保持的前提下，每位工程师的并发会话数（从 OpenTelemetry 导出数据统计），以及一天中用于操控（而非等待）的时间占比。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>每位工程师每周合入的变更数，与返工率并读（返工率按 PR 历史确定）。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 8 课 ============ -->
+    <section id="lesson-8">
+      <span class="stage-badge">Stage 4 测试</span>
+      <h2><span class="num">08</span>给 Claude 一个反馈闭环</h2>
+      <p class="section-lead">始终给 Claude 一条能验证自己工作的途径，无论是测试、构建，还是截图比对。让一个会话在工程师看到之前，先检查自己的工作、修掉自己的错误。</p>
+      <div class="insight">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+        <div><b>反馈闭环不应与验证子代理（Stage 3 构建）混为一谈</b><p>反馈闭环贯穿整个任务，按工作所需运行任意多次。而验证子代理是打包最终检查的一种方式：在会话认为工作已完成之后，用一个全新的上下文窗口跑一遍。这样一来，结论就不会被产出这些代码的那些假设所染色。</p></div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>「代码可用」这个信号来得很晚：CI 是几分钟后，测试人员是几天后，生产环境是几周后。当代码由 agent 产出时，信号来得晚就意味着必须由人来检查它的全部输出，而那个人就成了瓶颈。</td>
+              <td>给会话一条在人看到之前检查自己工作的途径：跑测试、跑构建、截图。Claude 反复迭代直到检查通过，所以到达工程师手上的东西已经通过了这道检查。搭建这个闭环由运行该会话的工程师负责，下面的步骤就是写给他的。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span class="none">前置条件：无</span></div>
+        <p><strong>基础设施</strong>：一套测试和一次构建，各能用一条命令在本地跑起来。对 UI 工作而言，让 Claude 能看见结果至关重要——要么是一个浏览器工具，要么是通过 MCP 接进来的截图工具。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>如果今天检查这项工作需要一串命令加上一些环境知识，就把它包成单一目标，例如 <code class="inline-code">make test</code> 或 <code class="inline-code">npm test</code>，并在失败时以非零码退出。</li>
+          <li>在 <code class="inline-code">CLAUDE.md</code> 的 Commands 一节，逐条列出每个命令，并附上一个健康输出的示例。</li>
+          <li>陈述一个目标，并让它可量化，这样 Claude 无需询问你就能检查工作。例如：「<code class="inline-code">test_status.py</code> 中所有测试通过」、「截图与所附设计稿一致」，或者「该端点返回 200 且带上新字段」。</li>
+          <li>修 bug 时，先写那个会失败的测试。请 Claude 把该 bug 复现为一个测试、跑它，并确认它失败的原因正是你预期的那个原因。提交这个测试。<strong>只有到这一步之后</strong>，才请 Claude 在不编辑该测试的前提下让它通过——最后一步提到的测试文件 hook 会强制这项限制。一个在修复之前就已存在、且 agent 无法改写的测试，才是该 bug 已消失的证明。</li>
+          <li>对 UI 工作，用视觉检查闭合这个环。给 Claude 一个浏览器或截图工具，给它设计稿，让它迭代：实现、截图、比对、调整。两三轮是正常的，且每一轮结果都应更好。</li>
+          <li>把验证纳入「完成」的定义。这条指令写在 <code class="inline-code">CLAUDE.md</code> 里：「在报告任务完成之前先跑测试，并展示输出。」</li>
+          <li>最后，这个闭环本身也需要被保护，因为一个正在修代码的 agent 绝不能有能力削弱对那段代码的检查。一个在修复任务期间拦截对测试文件编辑的 hook 就能做到这一点。替代方案是在评审中检查 diff，并拒绝任何触及测试的改动。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">CLAUDE.md</code> 的验证段落：</p>
+        <div class="codesnippet">
+          <span class="code-lang">markdown &middot; CLAUDE.md 验证段落</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>## Verifying your work
+
+- Build: make build (must finish with "Build succeeded")
+- Test: make test (all green; never skip or delete a failing test)
+- Lint: make lint (zero warnings)
+
+Run all three before reporting any task complete, and paste the output.
+If a test fails, fix the code, not the test.</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <ul>
+          <li><strong>强制了什么</strong>：任务报告完成之前必须验证，以及在修复期间禁止 agent 编辑测试文件——组织希望这两点得到保证时，都以 hooks 实现。</li>
+          <li><strong>证据是什么</strong>：<code class="inline-code">make test</code> 的字面输出、构建日志，或者 Claude 跑出并粘贴的截图比对结果。也就是说，证据来自工具链本身。</li>
+          <li><strong>留痕在哪里</strong>：留痕在会话轨迹中（由 OpenTelemetry 导出转发到组织的可观测性栈），以及 PR 的检查运行中——评审者和日后任何审计方都能看到它。</li>
+          <li><strong>谁批准</strong>：评审该 PR 的代码所有者。因为机械性的证据已经附上，他可以专注于意图与风险。</li>
+        </ul>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>agent 所写变更的 CI 一次通过率，这是 CI 系统本就支持的数据。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>每个 PR 的评审时长（取自 PR 元数据）——一旦测试接住了原本靠评审者接住的问题，它应当下降；以及来自事件追踪系统的变更失败率。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 9 课 ============ -->
+    <section id="lesson-9">
+      <span class="stage-badge">Stage 4 测试</span>
+      <h2><span class="num">09</span>在 CI 中持续跑 evals</h2>
+      <p class="section-lead">evals 是阶段门禁式 QA 在 AI 原生体系下的对应物。落到实处，它是一套在 <strong>agent 的配置发生变更时</strong>就运行的评测套件。当换入一个新模型、或者某段提示词被改写时，eval 套件会告诉你该 agent 是否仍以同样的标准完成工作。</p>
+      <p>evals 应当被视为一套活的套件。随着模型能力提升，曾经具备区分力的用例会失去区分力，而持续监控中浮现的新用例必须被补进来。</p>
+      <p>视具体用例而定，有些团队可能更倾向于按固定节奏离线跑这些 evals，而不是每次变更都跑。下面的步骤针对的是持续评测。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span>前置条件：<code class="inline-code">CLAUDE.md</code></span><span>反馈闭环（Stage 4 测试）</span></div>
+        <p><strong>基础设施</strong>：能以非交互方式运行 Claude Code 的 CI，以及一个有预算跑 eval 的 API key。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>平台工程师从近期工作中收集 20 到 50 个真实任务，每个都带上其预期结果或已被接受的结果。</li>
+          <li>把每个任务写成一个 eval，也就是提示词加上定义「可接受」的那些检查（测试通过、lint 干净、行为未变、策略被遵守）。</li>
+          <li>该套件在 CI 中以非交互方式运行：按计划定时运行，以及在 <code class="inline-code">CLAUDE.md</code>、skills 或 hooks 发生任何变更时运行——因为这些配置在操控 agent，理应享有代码所享有的回归测试。</li>
+          <li>把配置变更卡在结果上。一处降低了通过率的 skill 变更，在合入之前要先被评审。</li>
+          <li>每一次生产事故都产出一个 eval，由拥有该事故的团队撰写，并作为回归测试常驻在套件中。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">.github/workflows/agent-evals.yml</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">yaml &middot; agent-evals.yml</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>name: Agent evals
+on:
+  pull_request:
+    paths: ['CLAUDE.md', '.claude/**']
+  schedule:
+    - cron: '0 2 * * *'
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install -g @anthropic-ai/claude-code
+      - name: Run eval suite
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          for eval in evals/*.json; do
+            claude -p "$(jq -r '.prompt' $eval)" \
+              --allowedTools "Read,Edit,Bash(make test)" \
+              --output-format json &gt; result.json
+            ./evals/check.sh "$eval" result.json
+          done</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>evals 给了 QA 一道能跟上 agent 产出速度的门禁。通过率阈值以合入检查的形式强制执行，各次运行都留痕以便结果能跨时间比较，而拥有该配置变更的团队负责批准它。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>eval 通过率随时间的走势（套件每次运行都会报告），以及一次生产事故要多久才变成一个常驻 eval。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>在 CI 中被接住的回归数，对比在生产环境中被发现的回归数（后者取自事件追踪系统）。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 10 课 ============ -->
+    <section id="lesson-10">
+      <span class="stage-badge">Stage 5 部署</span>
+      <h2><span class="num">10</span>让 AI 进入 PR 评审闭环</h2>
+      <p class="section-lead">Claude 既做评审方，也做被评审方。它对照组织的策略评审进来的 PR，也处理针对它自己 PR 的评审意见。这让工程师在 PR 评审中能专注于行为本身，说到底就是判断意图与风险。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>评审产能是按人的产出规划的。一个 PR 要等某位评审者把它全部读完，评审质量随该评审者的负载而波动，作者一边催一边看待办堆积。</td>
+              <td>所有 PR 都获得同一套评审环节，发现项按严重度排序。人的注意力上移一个层次：这个变更是否做到了计划所要求的事，以及风险是否可接受。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span>前置条件：已更新的 <code class="inline-code">CLAUDE.md</code>（Stage 3 构建）</span><span>skills（若要强制成文策略）</span><span>已定义好的子代理</span></div>
+        <p><strong>基础设施</strong>：一个已安装 Claude 集成的仓库——要么是由管理员启用的受管 Code Review 服务（研究预览），要么是在你自己的 CI 中运行的 claude-code-action，并在需要时把模型调用走 Amazon Bedrock、Google Cloud 的 Vertex AI 或 Microsoft Foundry（CI/CD play 覆盖了这些部署选项）。要求代码所有者批准的分支保护策略同样值得配上。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>受管 Code Review 服务是启动最快的方式：由管理员启用它并选择仓库。当你需要掌控流水线，或者希望 API 调用走你自己的云合约时，就用 claude-code-action 在自己的 CI 里跑评审（CI/CD play 覆盖了那套管路）。</li>
+          <li>技术主管把评审策略写成仓库根目录下的 <code class="inline-code">REVIEW.md</code>，按组织关心的那些环节划分：bug 与逻辑错误；安全与漏洞；对照规格（需求 play 产出的 <code class="inline-code">spec.md</code>）、实现计划（plan mode play 产出的 <code class="inline-code">plan.md</code>）与设计原则的合规性。<code class="inline-code">REVIEW.md</code> 还定义了什么算 Important 而什么只是 Nit，以及什么该跳过。</li>
+          <li>技术主管设定人工介入的阈值。发现项本身既不批准也不阻塞 PR，分支保护仍然要求代码所有者的批准。若某位平台工程师希望按发现项来卡合入，可以读取检查运行发布的那份机器可读的严重度计数。</li>
+          <li>当某位评审者或作者在一条评审意见上标记 <code class="inline-code">@claude</code> 时，Claude 处理该意见并推送修复。PR 讨论线同时记录下这个请求和这次改动。这个修复闭环通过 claude-code-action 运行；在受管服务里，评论 <code class="inline-code">@claude review</code> 则是请求一次全新的评审。对 Claude 自己开的 PR，可以再往前一步，让 Claude 把这个 PR 一路看护到合入。有些团队把这个闭环包成一个自定义斜杠命令：它清扫该 PR 上未解决的评审意见和失败的检查，逐一处理并推送修复，直到该 PR 全绿、只等代码所有者批准。</li>
+          <li>评审发现项反哺回 <code class="inline-code">CLAUDE.md</code>。当某次评审第二次标记出同一个错误时，就在那次评审中把纠正写进 <code class="inline-code">CLAUDE.md</code>；而因为评审会读取 <code class="inline-code">CLAUDE.md</code>，这个错误从下一个 PR 起就会被接住。评审也会指出某次变更已经让 <code class="inline-code">CLAUDE.md</code> 过时了。</li>
+          <li>技术主管每月调优一次这套配置：给发现项打分使评审方持续改进，并在 <code class="inline-code">REVIEW.md</code> 里给 Nit 的数量设上限。生成路径以及 CI 已经在强制的东西都排除掉。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p><code class="inline-code">REVIEW.md</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">markdown &middot; REVIEW.md</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre># Review instructions
+## Passes
+Run three passes and tag each finding with its pass:
+- Bugs: logic errors, broken edge cases, subtle regressions
+- Security: injection risks, authentication gaps, PII in logs
+- Compliance: the change matches spec.md, plan.md and our design principles
+## What Important means here
+Reserve Important for findings that would break behavior, leak data
+or breach a policy. Style and naming are nits.
+## Cap the nits
+Report at most five nits per review; summarize the rest as a count.
+## Do not report
+Generated files under src/gen/ and anything CI already enforces.</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>职责分离得以保留，因为写了这些代码的那个 agent 没有任何途径批准它。<code class="inline-code">REVIEW.md</code> 中的评审策略应用于所有 PR，而发现项、修复、评分和批准全部留痕在 PR 历史里——因此 PR 就是那份审计记录。批准来自人，通过分支保护给出，并由发现项提供依据。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>到首次评审的时间（应当降到分钟级），以及无需人碰分支即被解决的评审意见占比（数据直接存在 Git 上）。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>合入前被接住的缺陷与漏洞数，对比逃逸到生产环境的那些（分别取自 PR 历史与事件追踪系统）。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 11 课 ============ -->
+    <section id="lesson-11">
+      <span class="stage-badge">Stage 5 部署</span>
+      <h2><span class="num">11</span>用 hooks 作为审批门禁</h2>
+      <p class="section-lead">构建阶段把 hooks 当作护栏使用：在无人介入的情况下放行或拦截动作（<strong>Stage 3 构建</strong>）。而 hook 也可以「询问」——把动作暂停住，直到某个特定的人批准。这正是发布卡口所需要的能力。</p>
+      <div class="insight">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+        <div><b>hooks 并不专属于部署</b><p>这个 play 被放在 <strong>Stage 5 部署</strong>，是因为发布门禁是最清晰的例子；但 <strong>Claude 在哪里行动，它们就在哪里运行</strong>。举例来说，hooks 可以在 <strong>Stage 3 构建</strong> 期间拦截「没有变更工单就修改迁移脚本和基础设施」的行为，也可以在 <strong>Stage 4 测试</strong> 的修复任务中阻止 agent 编辑测试文件。</p></div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span class="none">前置条件：无</span></div>
+        <p><strong>基础设施</strong>：一份书面清单，列出变更流程所要求的各项审批。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>工程管理层会同变更管理与合规部门，列出那些必须保留下来的人工审批门禁，例如变更管理签署确认、发布授权，以及对受保护路径的修改。</li>
+          <li>平台工程师把每道门禁表达为一个 hook——一个在 Claude 行动之前运行的脚本，它可以放行、询问或拦截。</li>
+          <li>团队级 hooks 放在 Git 中的 <code class="inline-code">.claude/settings.json</code> 里；不可协商的 hooks 放进由平台或 IT 管理员掌管的受管设置中，个别工程师无法把它们关掉。</li>
+          <li>拦截应当自我说明：当一个 hook 阻止了某个动作时，原因和取得批准的途径都要出现在 Claude 的输出里。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p>项目 <code class="inline-code">.claude/settings.json</code> 中的一个独立示例：</p>
+        <div class="codesnippet">
+          <span class="code-lang">json &middot; .claude/settings.json</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/production-gate.sh" }
+        ]
+      }
+    ]
+  }
+}</pre>
+        </div>
+        <p>以及门禁脚本本身（<code class="inline-code">.claude/hooks/production-gate.sh</code>）：</p>
+        <div class="codesnippet">
+          <span class="code-lang">bash &middot; production-gate.sh</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>#!/bin/bash
+# Production deploys require a named release authorization
+cmd=$(jq -r '.tool_input.command' &lt; /dev/stdin)
+if [[ "$cmd" == *"deploy"* &amp;&amp; "$cmd" == *"production"* ]]; then
+  if [ -z "$RELEASE_APPROVAL" ]; then
+    echo "Production deploys need a release authorization." &gt;&amp;2
+    exit 2   # exit 2 blocks the action; the message goes to Claude
+  fi
+fi
+exit 0</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>hooks 就是那些审批门禁。门禁条件每一次都被强制执行，对所有人生效。放行与拦截的决定都带时间戳留痕。门禁同时也定义了什么才算「批准」——无论那是一张已获批的变更工单，还是发布经理的签署确认。</p>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>受监管企业的受管设置</h3>
+      <p>下面是一份面向受监管企业的受管设置，由平台团队通过移动设备管理（MDM）或管理控制台下发。工程师无法编辑或覆盖其中任何一项设置：</p>
+      <div class="codesnippet">
+        <span class="code-lang">json &middot; managed settings</span>
+        <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>{
+  "permissions": {
+    "deny": [
+      "Read(.env*)", "Read(./secrets/**)",
+      "WebFetch", "Bash(curl *)", "Bash(wget *)"
+    ],
+    "allow": [
+      "Bash(git *)", "Bash(make build)",
+      "Bash(make test)", "Bash(make lint)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  },
+  "allowManagedPermissionRulesOnly": true,
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "network": { "allowedDomains": ["git.internal.example.com", "registry.npmjs.org"] },
+    "credentials": {
+      "files": [
+        { "path": "~/.ssh", "mode": "deny" },
+        { "path": "~/.aws/credentials", "mode": "deny" }
+      ],
+      "envVars": [ { "name": "GITHUB_TOKEN", "mode": "deny" } ]
+    }
+  },
+  "allowManagedHooksOnly": true,
+  "disableSideloadFlags": true,
+  "allowManagedMcpServersOnly": true,
+  "strictKnownMarketplaces": [
+    { "source": "github", "repo": "example-corp/approved-plugins" }
+  ],
+  "requiredMinimumVersion": "2.1.193"
+}</pre>
+      </div>
+      <p><strong>用控制项的语言来说，这些设置分别做了什么：</strong></p>
+      <ul>
+        <li><code class="inline-code">permissions.deny</code> 让密钥不进入 agent 的上下文，并阻断通过工具进行的任意出网。<code class="inline-code">permissions.allow</code> 则预先批准安全的内层循环，使拒绝清单不至于演变成审批疲劳。</li>
+        <li><code class="inline-code">disableBypassPermissionsMode</code> 加上 <code class="inline-code">allowManagedPermissionRulesOnly</code>，意味着任何工程师、任何项目文件、任何命令行参数都无法放宽这些规则。</li>
+        <li><code class="inline-code">sandbox</code> 覆盖权限机制覆盖不到的部分。在工具层面拒绝 WebFetch，并不能阻止一条 shell 命令连上网络；而 OS 级的域名允许清单则直接阻断出网——所以两者是在不同层次上强制同一个目标。<code class="inline-code">failIfUnavailable</code> 和 <code class="inline-code">allowUnsandboxedCommands</code> 把沙箱变成一项前置条件：沙箱无法初始化时 Claude Code 拒绝启动，而在沙箱内失败的命令不能拿到沙箱外重试。</li>
+        <li><code class="inline-code">credentials</code> 处理的是拒绝规则漏掉的一种情形。<code class="inline-code">permissions.deny</code> 管的是 Claude 的文件工具，但一条沙箱内的 shell 命令默认仍可能读到 <code class="inline-code">~/.ssh</code> 或 <code class="inline-code">~/.aws/credentials</code>。这一段拒绝了那些读取，并从沙箱命令的环境中剥离所列的密钥。</li>
+        <li><code class="inline-code">allowManagedHooksOnly</code> 意味着只有定义在受管设置中的 hooks 才会运行；用户级、项目级和本地设置中的 hooks 一律被阻断——包括上面那个独立的 <code class="inline-code">.claude/settings.json</code> 示例。要让本 play 的审批门禁保持强制生效，就得把它定义在受管文件自己的 <code class="inline-code">hooks</code> 段里。</li>
+        <li><code class="inline-code">disableSideloadFlags</code> 和 <code class="inline-code">strictKnownMarketplaces</code> 意味着工程师机器上的任何 skill、agent、hook 或 MCP 服务，都来自组织已批准的插件市场，而不是来自某个家目录。市场允许清单控制什么可以被安装，而那些能为单次运行侧载插件、agent 或 MCP 配置的参数，会在启动时被拒绝。</li>
+        <li><code class="inline-code">allowManagedMcpServersOnly</code> 让 agent 的工具面成为一份由平台团队掌管的允许清单。</li>
+        <li><code class="inline-code">requiredMinimumVersion</code> 让低于已批准下限的版本无法启动，因此这些控制项是由一个组织确实评估过的构建版本来强制执行的。</li>
+      </ul>
+      <div class="insight warn">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div><b>请把这个示例当作起点，按你自己的环境定制</b><p>每一条拒绝规则都会移除某项能力，而正确的平衡点取决于该仓库的数据分级。设置参考文档记录了全部键，包括那些仅限受管使用的键。</p></div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <p>针对 hooks 本身：</p>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>在每道审批门禁上等待所花的时间。每一次 hook 决定都会带时间戳以及放行或拦截的结论写入 OpenTelemetry 导出数据，因此每道门禁的等待时长都是可见的。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>引入 hooks 前后，抵达生产环境的门禁违规数（取自事件追踪系统）。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 12 课 ============ -->
+    <section id="lesson-12">
+      <span class="stage-badge">Stage 5 部署</span>
+      <h2><span class="num">12</span>CI/CD 集成与部署</h2>
+      <p class="section-lead">在 CI/CD 流水线内部以非交互方式运行 Claude Code，把执行过程沙箱化以便长时间运行的 agent 也能安全运行，通过 MCP 集成把部署能力暴露出来，并在 agent 真正需要之前就把各条回滚路径演练好。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>流水线运行确定性脚本，任何需要判断的事都要等人：比如甄别那个不稳定的测试、写变更日志，或者搞清楚构建为什么坏了。部署与回滚是人在压力下照着执行的运行手册。</td>
+              <td>Claude 在流水线内部以非交互方式运行那些需要判断的步骤，在沙箱中、带受限作用域的凭据下执行。部署工具通过 MCP 暴露给 agent，因此那条写出并测试了变更的工作流，也能把它发布出去、并把它回滚回来——全部发生在组织按环境定义的门禁之内。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span>前置条件：让 AI 进入 PR 评审闭环</span><span>用 hooks 作为审批门禁</span></div>
+        <p>门禁必须先存在，自动化才谈得上加速通过它们。</p>
+        <p><strong>基础设施</strong>：一个已安装 claude-code-action 的 CI 平台，或者任何能调用 <code class="inline-code">claude -p</code> 的执行器；通过 API 获得的模型访问权限，或在流量必须留在组织云合约内时走 Amazon Bedrock、Microsoft Foundry 或 Vertex AI；面向各部署目标的 MCP 服务；以及一份供 agent 作业使用、默认不持有任何常驻生产凭据的沙箱配置。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>平台工程师从只读的判断类步骤开始。在流水线作业里用 <code class="inline-code">claude -p</code> 来甄别一次失败的构建、总结一个不稳定的测试，或者起草变更日志。</li>
+          <li>把写入类步骤加到既有门禁之后，用于修 lint、更新生成的文档，或通过 <code class="inline-code">@claude</code> 提及来处理评审意见这类活儿。agent 写出的任何东西都以 PR 的形式、经由分支保护抵达，agent 没有任何途径推送到 main。</li>
+          <li>执行过程是沙箱化的。agent 作业运行在容器中、受网络策略约束，使用短时效、受限作用域的令牌，且默认不持有生产凭据。</li>
+          <li>通过 MCP 暴露部署能力。部署、查状态和回滚成为工具，按环境限定作用域——于是 agent 的部署权力是一份允许清单，而不是一个带着凭据的 shell 脚本。</li>
+          <li>按环境分级自主程度。在开发环境，agent 自由部署。在生产环境，agent 准备好这次发布、由发布经理授权，并有一个 hook 强制那道生产门禁。预发布环境处在两者之间。</li>
+          <li>回滚应当是整条流水线中演练得最充分的路径：一条 agent 能够运行的单一命令，并且在预发布环境中被定期演练。闭合循环 play（<strong>Stage 6 维护</strong>）会在控制带被突破时调用这条回滚，所以它必须事先被证明可用。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p>流水线步骤：</p>
+        <div class="codesnippet">
+          <span class="code-lang">yaml &middot; pipeline step</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>- name: Triage failed build
+  if: failure()
+  run: &gt;
+    claude -p "Read the build log at out/build.log. Identify the most
+    likely cause, say whether the failure looks flaky or real, and write a
+    three-line summary for the PR thread." &gt;&gt; triage.md</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <div class="insight">
+          <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div><b>统摄性原则</b><p><strong>agent 可以行动到生产门禁为止，但不能越过它。</strong>下面这些控制项强制该原则。</p></div>
+        </div>
+        <ul>
+          <li><strong>分支保护</strong>把 agent 写出的任何东西都变成一个 PR，不存在直通 main 的路径。</li>
+          <li><strong>生产部署 hook</strong> 拦住这次发布，直到一位具名的发布经理授权。每一次非交互运行都以 agent 自己的身份行动，因此流水线日志把「agent 做了什么」与「触发它的那位工程师做了什么」区分开来。</li>
+          <li><strong>按环境划分的权限层级</strong>规定了 agent 在抵达门禁之前可以做到多少事。</li>
+        </ul>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>无需呼叫人工即被甄别处理的流水线失败占比，取自 CI/CD 流水线日志。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>DORA（DevOps Research and Assessment）度量指标——CI 系统和部署工具本就在产出这些数据。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 第 13 课 ============ -->
+    <section id="lesson-13">
+      <span class="stage-badge">Stage 6 维护</span>
+      <h2><span class="num">13</span>用指标闭合整个循环</h2>
+      <p class="section-lead">前面每一个阶段都需要一个人来启动它，而 Stage 6 把重心转向让 Claude 自主运行以闭合这个循环。</p>
+      <p>举例来说，一个持续运行的监控 agent 可以在一张 bug 工单被提出之后，创建一份 <code class="inline-code">intent.md</code>，并让它流经需求、计划、构建、测试和评审各个环节。<strong>Stage 6 维护</strong> 以无人值守方式运行，各阶段之间设有一道独立的置信度门禁——可以是一项确定性检查，也可以是一个对抗性的评审 agent——由它决定上一阶段的产出是继续往下走，还是升级给人处理。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>发生了什么变化</h4>
+        <div class="table-wrap">
+          <table class="shift-table">
+            <thead><tr><th>传统做法</th><th>AI 原生做法</th></tr></thead>
+            <tbody><tr>
+              <td>维护是一个被动的阶段。所有工单或事故都要等一个人来处理、来重新启动流程。凌晨三点触发的告警可能被漏掉，一张工单可能一直躺在待办里等人来捡，而如果又有别的火情烧起来，事后复盘的行动项可能根本到不了代码库。</td>
+              <td>一个触发器——控制带被突破、一张工单、一条频道消息，或者一个定时计划——在没有人介入的情况下唤起 Claude。Claude 做诊断，只经由受门禁约束的路径行动，并把它的发现写成 <code>intent.md</code>，随后这份产物流经上述各个阶段。人负责甄别与评审这些工作，而不再需要启动它们。</td>
+            </tr></tbody>
+          </table>
+        </div>
+      </div>
+      <p>一个确定性脚本盯着生产环境，在控制带被突破时唤起 Claude。「监控突破」是这个自主循环模式的一个便于讲解的例子；而本阶段末尾的 Claude Tag（公开测试）一节，覆盖的是通过其他渠道抵达的工作。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>上手准备</h4>
+        <div class="prereq"><span>前置条件：<code class="inline-code">intent.md</code></span><span>由 Claude 加速的 PR 评审</span><span>作为动作边界的 hooks</span><span>CI/CD 的回滚路径</span></div>
+        <p><code class="inline-code">intent.md</code> 为这个循环提供了一个可用于重新启动的结构化输出。以及由 Claude 加速的 PR 评审、作为动作边界的 hooks，还有 CI/CD 的回滚路径（最高自主层级会调用它）。</p>
+        <p><strong>基础设施</strong>：一个检测脚本能够查询的指标存储（Prometheus、CI 系统的 API，或同类系统）；对仓库的读取权限；一条在 CI 中以非交互方式运行 Claude Code 的途径，或者用于接收 webhook 的服务所需的 Agent SDK。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>怎么执行</h4>
+        <ol class="steps">
+          <li>服务责任人或平台工程师挑一个具有稳定滚动基线的指标，例如 CI 测试失败率、部署后 5xx 率，或 PR 周期时长。</li>
+          <li>他们编写检测脚本，通常是在滚动窗口上计算均值与标准差，并配合判异规则（Western Electric 规则或类似规则），使控制带既能捕捉突刺、也能捕捉缓慢漂移。该脚本纳入版本控制并有单元测试，且检测环节保持完全确定性，不涉及任何模型。</li>
+          <li>响应层级定义在纳入版本控制的配置里（下面的 <code class="inline-code">bands.yaml</code>）。在 1σ 时脚本只记录日志；在 2σ 时它以只读方式唤起 Claude 做诊断；在 3σ 时 Claude 可以行动，但只能通过开一个进入评审门禁的 PR，或者触发一份事先批准的运行手册。</li>
+          <li>触发层可以是 GitHub 或 GitLab 里的定时工作流、来自既有监控栈的 webhook，或者网络内部的一个 cron 作业。Claude 以无状态方式运行——要么作为 CI 执行器上的一个非交互步骤，要么作为沙箱容器中的一个 Agent SDK 服务——CI/CD play 覆盖了部署与模型访问的各种选项。正因为这次运行是无状态且非交互的，一个循环可以在无人启动的情况下开始和结束。</li>
+          <li>agent 把它的诊断按 <strong>Stage 1 规划</strong> 的格式写成 <code class="inline-code">intent.md</code>，涵盖该异常及其证据、期望结果、受影响的系统，以及任何待解决的问题。从那里开始，这个发现像其他任何事项一样流经整条流水线。</li>
+          <li>服务责任人或值班工程师甄别这个队列，把面向产品的发现路由给产品负责人：立即修、排期、或者驳回。驳回会用于调优控制带，帮助降低噪声。</li>
+          <li>当一个修复上线时，为该事故补一个 eval（见持续 evals play），以确保此类问题今后被防住。</li>
+        </ol>
+        <h4>长什么样</h4>
+        <p>例如，一份监控 CI 测试失败率的 <code class="inline-code">bands.yaml</code>：</p>
+        <div class="codesnippet">
+          <span class="code-lang">yaml &middot; bands.yaml</span>
+          <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>metric: ci_test_failure_rate
+baseline: rolling_30d
+rules: western_electric
+tiers:
+  1sigma: { action: log }
+  2sigma: { action: diagnose,
+            tools: "Read,Grep,Bash(gh run view *)" }
+  3sigma: { action: propose,
+            routes: [pull_request, runbook:rollback-deploy] }</pre>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>治理考量</h4>
+        <p>层级边界由纳入版本控制的配置强制执行，同时权限设置与受管设置拒绝生产环境访问。唤起、发现项和甄别决定都带时间戳留痕。服务责任人甄别并批准发现项，由此产生的变更走正常的 PR 评审门禁，而 agent 可以触发的那些运行手册都是事先被批准过的。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-6 4 3 5-7"/></svg>怎么度量</h4>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span class="m-label">领先指标</span>
+            <p>从控制带被突破，到一份 <code class="inline-code">intent.md</code> 进入甄别队列所花的时间，对比原先「从事故到复盘行动项」的时间。检测脚本的日志里有突破时间戳和事故的层级。</p>
+          </div>
+          <div class="metric-card lagging">
+            <span class="m-label">滞后指标</span>
+            <p>发现项最终变成已合入修复的占比（甄别队列对比实际 PR 历史），以及同类事故的重复发生次数——随着修复为 eval 套件补进用例，这个数字应当下降。</p>
+          </div>
+        </div>
+        <h4>举例</h4>
+        <ul>
+          <li>当 CI 测试失败率突破 3σ 时，agent 隔离那个不稳定的测试，或者开一个回退 PR，由评审门禁来定夺。</li>
+          <li>当部署后 5xx 率突破 3σ 且时间窗内有一次部署时，agent 触发既有的回滚流水线。</li>
+          <li>当 PR 周期时长触发某条漂移规则时，agent 为工程管理层写一份报告——这表明这套机制对流程类指标同样有效，不止适用于生产指标。</li>
+        </ul>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>用 Claude Tag 让 Claude 值班</h3>
+      <p>事故也可能通过其他途径抵达，比如 Slack 或 Microsoft Teams 这类职场沟通应用。事故的形态可能是晚上十点在某个事故频道里发出的一条「需要紧急修复」的 Slack 消息，而现在它可以被立即处理。Claude Tag（目前在 Slack 上公开测试）让 Claude 以自己的身份成为那些频道的成员，于是每一起新事故都有了一位第一响应者，而这次响应本身也成为循环的一部分，并成为未来事故可以调用的记忆。</p>
+      <p>对话和机构知识都留在频道里，频道中的任何人都可以引导并推进这次响应。任何团队成员都能实时验证假设、探索新方案、展开排查，而频道历史又进一步增强了可审计性。通过 MCP 访问权限，Claude 会验证该指标已回到基线并在讨论线中确认这一点，并把复盘写入一个纳入版本控制的经验教训文件，供未来的排查读取。</p>
+      <p>Claude Tag 承接的工作不止事故。通过 MCP 在一张工单上被标记，或者在频道里被问到时，Claude 以同样的方式甄别这项工作：一个小而边界清晰的修复以 PR 的形式经由评审门禁抵达，而任何更大的事项则被写成 <code class="inline-code">intent.md</code> 交给 <strong>Stage 1 规划</strong>——到这一步，这个循环就开始自己喂养自己了。</p>
+    </section>
+
+    <!-- ============ 第 14 课 ============ -->
+    <section id="lesson-14">
+      <span class="stage-badge">结语</span>
+      <h2><span class="num">14</span>结语与资源</h2>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>结语</h3>
+      <p>模型与运行框架都变得更先进了，这让各组织不仅能转型自己生产代码的方式，还能转型整个软件开发生命周期。这场转型把人的判断保持在流程的核心位置，并考虑了大型企业组织的治理与监管要求。</p>
+      <p>本手册汇总了我们 Applied AI 团队每天为客户实际执行的诸多真实最佳实践，我们希望你觉得它是一份实用且可落地的资料。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>资源</h3>
+      <p>下列文档是一个平台团队搭建本手册所述各项控制项时所需的材料，大致按你会推行的顺序排列。</p>
+      <ul class="ref-list">
+        <li><span class="rt">Set up Claude Code for your organization（管理员决策地图，从这里开始）</span><a href="https://code.claude.com/docs/en/admin-setup" target="_blank" rel="noopener">code.claude.com/docs/en/admin-setup</a></li>
+        <li><span class="rt">Settings reference and precedence（设置参考与优先级，含全部仅限受管使用的键）</span><a href="https://code.claude.com/docs/en/settings" target="_blank" rel="noopener">code.claude.com/docs/en/settings</a></li>
+        <li><span class="rt">Server-managed settings from the Claude admin console（来自 Claude 管理控制台的服务端受管设置）</span><a href="https://code.claude.com/docs/en/server-managed-settings" target="_blank" rel="noopener">code.claude.com/docs/en/server-managed-settings</a></li>
+        <li><span class="rt">Permissions（权限）</span><a href="https://code.claude.com/docs/en/permissions" target="_blank" rel="noopener">code.claude.com/docs/en/permissions</a></li>
+        <li><span class="rt">Sandboxing（沙箱化：OS 级文件系统与网络隔离）</span><a href="https://code.claude.com/docs/en/sandboxing" target="_blank" rel="noopener">code.claude.com/docs/en/sandboxing</a></li>
+        <li><span class="rt">Hooks guide（hooks 指南）</span><a href="https://code.claude.com/docs/en/hooks-guide" target="_blank" rel="noopener">code.claude.com/docs/en/hooks-guide</a></li>
+        <li><span class="rt">Hooks reference（hooks 参考）</span><a href="https://code.claude.com/docs/en/hooks" target="_blank" rel="noopener">code.claude.com/docs/en/hooks</a></li>
+        <li><span class="rt">Skills</span><a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">code.claude.com/docs/en/skills</a></li>
+        <li><span class="rt">Plugins and private marketplaces（插件与私有市场：skills 与 hooks 的全组织分发方式）</span><a href="https://code.claude.com/docs/en/plugin-marketplaces" target="_blank" rel="noopener">code.claude.com/docs/en/plugin-marketplaces</a></li>
+        <li><span class="rt">Managed MCP（受管 MCP：集中控制 agent 的工具面）</span><a href="https://code.claude.com/docs/en/managed-mcp" target="_blank" rel="noopener">code.claude.com/docs/en/managed-mcp</a></li>
+        <li><span class="rt">Enterprise deployment overview（企业部署总览：Amazon Bedrock、Vertex AI、Microsoft Foundry）</span><a href="https://code.claude.com/docs/en/third-party-integrations" target="_blank" rel="noopener">code.claude.com/docs/en/third-party-integrations</a></li>
+        <li><span class="rt">Enterprise network configuration（企业网络配置）</span><a href="https://code.claude.com/docs/en/network-config" target="_blank" rel="noopener">code.claude.com/docs/en/network-config</a></li>
+        <li><span class="rt">Monitoring (OpenTelemetry)（监控）</span><a href="https://code.claude.com/docs/en/monitoring-usage" target="_blank" rel="noopener">code.claude.com/docs/en/monitoring-usage</a></li>
+        <li><span class="rt">The analytics dashboard（分析仪表盘）</span><a href="https://code.claude.com/docs/en/analytics" target="_blank" rel="noopener">code.claude.com/docs/en/analytics</a></li>
+        <li><span class="rt">Compliance API（合规 API：企业活动流、会话检索与删除）</span><a href="https://platform.claude.com/docs/en/manage-claude/compliance-api" target="_blank" rel="noopener">platform.claude.com/docs/en/manage-claude/compliance-api</a></li>
+        <li><span class="rt">Security model（安全模型）</span><a href="https://code.claude.com/docs/en/security" target="_blank" rel="noopener">code.claude.com/docs/en/security</a></li>
+      </ul>
+    </section>
+
+    <!-- ============ 转述完整性说明 ============ -->
+    <section id="fidelity">
+      <h2><span class="num">FN</span>转述完整性说明</h2>
+      <p class="section-lead">来自源文档，说明本次转述与英文采集版之间的对应关系与保留策略。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>对应关系</h3>
+      <p>本文 14 课与英文采集版 <code class="inline-code">Claude_Academy_AI-Native_SDLC_Playbook.md</code> 逐课一一对应，课号、阶段归属、五段式结构、双指标结构全部保持一致。每个 play 的「发生了什么变化」对照表、前置条件与基础设施清单、执行步骤条数均与原文相同。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>保持英文原样的内容</h3>
+      <p>（译出会失去可用性或造成歧义）</p>
+      <ul>
+        <li>全部代码示例，共 14 个：<code class="inline-code">intent.md</code>、Design 阶段提示词、<code class="inline-code">plan.md</code>、<code class="inline-code">CLAUDE.md</code>、<code class="inline-code">SKILL.md</code>、<code class="inline-code">verifier.md</code>、<code class="inline-code">CLAUDE.md</code> 验证段落、<code class="inline-code">agent-evals.yml</code>、<code class="inline-code">REVIEW.md</code>、hooks 的 <code class="inline-code">settings.json</code>、<code class="inline-code">production-gate.sh</code>、受监管企业受管设置 JSON、CI triage 步骤、<code class="inline-code">bands.yaml</code></li>
+        <li>文件名与路径：<code class="inline-code">intent.md</code>、<code class="inline-code">spec.md</code>、<code class="inline-code">plan.md</code>、<code class="inline-code">CLAUDE.md</code>、<code class="inline-code">REVIEW.md</code>、<code class="inline-code">.claude/skills/&lt;name&gt;/</code>、<code class="inline-code">.claude/agents/</code>、<code class="inline-code">.claude/settings.json</code> 等</li>
+        <li>配置键名：<code class="inline-code">disableBypassPermissionsMode</code>、<code class="inline-code">allowManagedHooksOnly</code>、<code class="inline-code">strictKnownMarketplaces</code> 等</li>
+        <li>命令：<code class="inline-code">/init</code>、<code class="inline-code">make test</code>、<code class="inline-code">claude -p</code>、<code class="inline-code">claude --worktree</code>、<code class="inline-code">@claude</code></li>
+        <li>产品名与专有名词：Claude Code、Claude Cowork、Claude Design、Claude Tag、Claude Academy、Amazon Bedrock、Vertex AI、Microsoft Foundry、Jira、ServiceNow、Figma、Prometheus、OpenTelemetry、DORA、Western Electric、claude-code-action、Agent SDK、MCP</li>
+        <li>严重度分级用词：Important、Nit（原文以此二词作判据，译出会与「重要/次要」的日常用法混淆）</li>
+        <li>资源清单中的文档标题（便于检索原文），中文释义以括注形式附加</li>
+      </ul>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>术语一致性</h3>
+      <p>见文首<a href="#glossary" style="color:var(--accent-strong);text-decoration:none">术语对照表</a>，全文先定后用。原文刻意做出的措辞区分在中文里同样保留，未合并：skill 是「建议性控制」而 hook 是「确定性层」；反馈闭环贯穿整个任务而验证子代理只在会话自认完成后跑一次；<code class="inline-code">intent.md</code> 是「原型规格」而 <code class="inline-code">spec.md</code> 是「需求与设计规格」。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>未纳入的内容</h3>
+      <p>原文 Introduction 的 3 张示意配图未复制图像，以「配图说明」形式保留其图注文字；其中 play 依赖关系图已代码复刻，产物见源文档 <code class="inline-code">assets/</code>。课程站点的 <code class="inline-code">complete</code> 页无实质内容（仅结业跳转），未纳入。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>校验</h3>
+      <p>源文档与英文版的结构一致性由同目录 <code class="inline-code">assets/verify_translation.py</code> 机械核对（课时数、课号连续性、阶段归属、代码块配对、代码块内容与英文版逐字节相同）。改动源文档后应重跑该脚本，非零退出即结论作废。</p>
+    </section>
+
+    <footer class="site-footer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v6h-6"/></svg>
+      AI 原生 SDLC 实战手册 · 中文转述自 Claude Academy 课程 · 2026.08 &nbsp;|&nbsp; <a href="index.html">返回技术热词时间线</a>
+    </footer>
+  </main>
+</div>
+
+<!-- ============ Reading Progress + Back to Top ============ -->
+<div class="progress-bar" id="progressBar" aria-hidden="true"></div>
+<button class="back-to-top" id="backToTop" type="button" aria-label="回到顶部" title="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+  // ============ 侧边栏 active state 跟随滚动 ============
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('#toc a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        tocLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, {
+    rootMargin: '-25% 0px -65% 0px',
+    threshold: 0
+  });
+
+  sections.forEach((s) => observer.observe(s));
+
+  // 点击 TOC 立刻高亮（防止平滑滚动期间观察者延迟）
+  tocLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      tocLinks.forEach((l) => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+
+  // ============ 阅读进度条 + 回到顶部 ============
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+
+  function onScroll() {
+    const doc = document.documentElement;
+    const scrolled = doc.scrollTop || document.body.scrollTop;
+    const max = (doc.scrollHeight - doc.clientHeight) || 1;
+    progressBar.style.width = Math.min(100, (scrolled / max) * 100) + '%';
+    backToTop.classList.toggle('visible', scrolled > 600);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ============ 代码块复制按钮 ============
+  document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const pre = btn.parentElement.querySelector('pre');
+      if (!pre) return;
+      const text = pre.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const original = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>已复制';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = original;
+      }, 1600);
+    });
+  });
+</script>
+</body>
+</html>
+
