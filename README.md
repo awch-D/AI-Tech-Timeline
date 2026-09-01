@@ -3,11 +3,12 @@
 > A timeline of **AI engineering buzzwords** — what emerged, when, and what it actually means. From ChatGPT (2022) to the Agentic Engineering era (2026).
 
 <p align="center">
-  <a href="https://awch-d.github.io/AI-Tech-Timeline/"><img src="https://img.shields.io/badge/preview-online-5b6cff?style=flat-square" alt="preview"/></a>
+  <a href="https://awch-d.github.io/AI-Tech-Timeline/"><img src="https://img.shields.io/badge/GitHub%20Pages-live-5b6cff?style=flat-square" alt="pages"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-34c759?style=flat-square" alt="license"/></a>
-  <img src="https://img.shields.io/badge/format-single--html-ff9500?style=flat-square" alt="single html"/>
-  <img src="https://img.shields.io/badge/lang-中文-1d1d1f?style=flat-square" alt="zh-CN"/>
-  <img src="https://img.shields.io/badge/style-Apple%20Glass-ff3b30?style=flat-square" alt="apple glass"/>
+  <img src="https://img.shields.io/badge/热词-31-ff9500?style=flat-square" alt="entries"/>
+  <img src="https://img.shields.io/badge/手册-5-af52de?style=flat-square" alt="handbooks"/>
+  <img src="https://img.shields.io/badge/format-single--html-1d1d1f?style=flat-square" alt="single html"/>
+  <img src="https://img.shields.io/badge/lang-中文-ff3b30?style=flat-square" alt="zh-CN"/>
 </p>
 
 ---
@@ -48,6 +49,20 @@
 
 ---
 
+## 📕 完整手册（5 份）
+
+以下热词已有完整的中文学习页，内容深度对齐独立 handbook 标准：
+
+| 热词 | 在线阅读 | 说明 |
+|---|---|---|
+| 检索增强生成 RAG | [rag.html](https://awch-d.github.io/AI-Tech-Timeline/rag.html) | 由独立仓库 RAG-Handbook 合并而来 |
+| 循环工程 Loop Engineering | [loop-engineering.html](https://awch-d.github.io/AI-Tech-Timeline/loop-engineering.html) | 由 Loop-Engineering-Handbook 合并而来 |
+| 可执行本体 Executable Ontology | [executable-ontology.html](https://awch-d.github.io/AI-Tech-Timeline/executable-ontology.html) | 由 Executable-Ontology-Handbook 合并而来 |
+| 智能体环境工程 | [agentic-environment-engineering.html](https://awch-d.github.io/AI-Tech-Timeline/agentic-environment-engineering.html) | 由同名 handbook 仓库合并而来 |
+| AI Native SDLC | [ai-native-sdlc.html](https://awch-d.github.io/AI-Tech-Timeline/ai-native-sdlc.html) | Claude Academy《The AI-Native SDLC Playbook》14 课完整中文转述，含 67 条术语对照表 |
+
+---
+
 ## 📂 项目结构
 
 ```
@@ -72,7 +87,7 @@ AI-Tech-Timeline/
 2. **产生了真实的工程影响** — 改变了一线开发者的工作方式或技术选型，而非纯营销话术
 3. **定义可一句话说清** — 条目描述需区分可验证事实与营销用语
 
-条目时间均标注到月，并按一手来源（论文 / 官方博客 / 发布日）逐条核实；个别存在多个候选时间节点的词条会在详情页中说明考据过程。
+条目时间均标注到月。**按一手来源（论文 / 官方博客 / 发布日）逐条核实是持续进行的工作，目前尚未全部完成**——部分条目的时间取自公开报道或社区共识的初稿判断，存在多个候选时间节点的词条会在核实后于详情页说明考据过程。欢迎通过 issue 指出时间偏差并附一手来源。
 
 ---
 
@@ -89,7 +104,12 @@ AI-Tech-Timeline/
 - `status: "handbook"` — 已有完整手册，`link` 指向同目录下的详情页 HTML（文件名使用热词的英文 slug）
 - `status: "pending"` — 已收录但详情页待补齐，主页点击时显示提示
 
-新增手册页：复制任一并存手册的 HTML 骨架，替换内容为新热词，命名与 `link` 对应即可，无需任何构建步骤。
+新增手册页时的几条约定：
+
+- 复制任一并存手册的 HTML 骨架，替换内容，文件名与 `link` 对应，无需任何构建步骤
+- 页面顶部保留「← 返回技术热词时间线」链接指向 `index.html`
+- **零外部资源**：图标一律内嵌 SVG，不引用任何 CDN 上的 CSS、JS、字体或图片
+- **示例代码块的汉化取舍**：自然语言类内容（需求文档、实施计划、提示词、评审指令、给 AI 读的项目约定）译为中文；机器读取类内容（配置文件、CI 定义、shell 脚本、skill 与子代理的 YAML frontmatter）保持英文原样。汉化块内的命令、文件路径、目录名、技术名，以及需要被字面匹配的输出串，同样保留英文
 
 ---
 
