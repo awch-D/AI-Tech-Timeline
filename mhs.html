@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MHS · Model Hardware Standard · 中文详情页</title>
+
+<!-- ============ SEO ============ -->
+<meta name="description" content="MHS（Model Hardware Standard）中文详解：Anthropic 推出的让 AI agent 安全操作物理设备的共享规范，当前为 research preview。覆盖标准化 driver、可发现性、设备自描述、MCP/CLI/API 三种控制通道、早期案例与厂商生态、已知局限与安全。" />
+<meta name="keywords" content="MHS, Model Hardware Standard, Anthropic, AI agent, 物理设备, driver, MCP, research preview, 自主实验室" />
+<meta name="author" content="Arno" />
+<meta name="theme-color" content="#5b6cff" />
+
+<!-- ============ Favicon (inline SVG) ============ -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6cff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='4' width='16' height='16' rx='3'/><path d='M9 9h6v6H9z'/><path d='M4 10H1'/><path d='M4 14H1'/><path d='M23 10h-3'/><path d='M23 14h-3'/></svg>" />
+
+<style>
+  :root {
+    /* 与 index.html 时间线主页同一套配色 */
+    --ink: #1d1d1f;
+    --ink-2: #48484a;
+    --ink-3: #8e8e93;
+    --line: rgba(0, 0, 0, .08);
+    --glass: rgba(255, 255, 255, .72);
+    --bg: #f5f5f7;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --gray: #aeaeb2;
+
+    /* 详情页派生变量 */
+    --text-primary: var(--ink);
+    --text-secondary: var(--ink-2);
+    --text-muted: var(--ink-3);
+    --glass-bg: var(--glass);
+    --glass-border: rgba(255, 255, 255, .78);
+    --glass-shadow: 0 8px 32px rgba(30, 38, 80, .08);
+    --glass-shadow-hover: 0 12px 40px rgba(30, 38, 80, .12);
+    --accent: #5b6cff;
+    --accent-soft: rgba(91, 108, 255, .10);
+    --accent-strong: #4453e0;
+    --code-bg: #1f2138;
+    --code-text: #e8eaf6;
+    --border-soft: var(--line);
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --font-cn: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif;
+    --font-mono: "SF Mono", "JetBrains Mono", "Menlo", "Monaco", "Consolas", monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-cn);
+    color: var(--text-primary);
+    line-height: 1.75;
+    font-size: 16px;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(99, 102, 241, .10), transparent 60%),
+      radial-gradient(1000px 500px at -10% 20%, rgba(52, 199, 89, .08), transparent 60%),
+      radial-gradient(900px 700px at 50% 110%, rgba(255, 149, 0, .07), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* ============== Layout ============== */
+  .layout {
+    display: grid;
+    grid-template-columns: 268px 1fr;
+    max-width: 1340px;
+    margin: 0 auto;
+    gap: 32px;
+    padding: 24px 32px 80px;
+  }
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; padding: 14px; gap: 16px; }
+    .sidebar { position: static !important; max-height: none !important; }
+  }
+
+  /* ============== Back link ============== */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 14px;
+    padding: 7px 14px;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    backdrop-filter: blur(20px) saturate(1.6);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    color: var(--accent-strong);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--glass-shadow);
+    transition: transform .2s ease, background .2s ease;
+  }
+  .back-link:hover { transform: translateX(-3px); background: #fff; }
+  .back-link svg { width: 15px; height: 15px; }
+
+  /* ============== Sidebar ============== */
+  .sidebar {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 16px;
+    box-shadow: var(--glass-shadow);
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding: 0 6px 12px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .sidebar-brand svg { width: 26px; height: 26px; flex-shrink: 0; color: var(--accent); }
+  .sidebar-brand b { font-size: 14px; letter-spacing: .2px; }
+  .sidebar-brand small { display: block; color: var(--text-muted); font-size: 11px; font-weight: 400; }
+  .toc { list-style: none; padding: 0; margin: 0; }
+  .toc li a {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 11px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 9px;
+    font-size: 13px;
+    transition: all .2s ease;
+    margin-bottom: 1px;
+  }
+  .toc li a:hover { background: var(--accent-soft); color: var(--accent-strong); }
+  .toc li a.active { background: var(--accent); color: #fff; font-weight: 500; }
+  .toc li a.active .tnum { background: rgba(255, 255, 255, .26); color: #fff; }
+  .toc .tnum {
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border-radius: 5px;
+    padding: 1px 0;
+  }
+  .toc-stage {
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 12px 11px 4px;
+    font-weight: 700;
+  }
+
+  /* ============== Hero ============== */
+  .hero {
+    background: linear-gradient(135deg, rgba(91, 108, 255, .10), rgba(255, 105, 180, .06));
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--radius-lg);
+    padding: 44px 40px;
+    margin-bottom: 24px;
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(91, 108, 255, .12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(91, 108, 255, .10);
+    color: var(--accent-strong);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .hero-tag svg { width: 13px; height: 13px; }
+  .hero h1 {
+    font-size: 38px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    letter-spacing: -.5px;
+    line-height: 1.25;
+    position: relative;
+  }
+  .hero .en-title {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin: 0 0 16px;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    margin: 0 0 24px;
+    max-width: 760px;
+    position: relative;
+  }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; position: relative; }
+  .meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, .62);
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-soft);
+    text-decoration: none;
+  }
+  .meta-chip svg { width: 13px; height: 13px; color: var(--accent); }
+  a.meta-chip:hover { background: #fff; color: var(--accent-strong); }
+
+  /* ============== Section ============== */
+  section {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 36px 40px;
+    margin-bottom: 22px;
+    box-shadow: var(--glass-shadow);
+    scroll-margin-top: 20px;
+  }
+  @media (max-width: 980px) { section { padding: 24px 20px; } .hero { padding: 28px 20px; } .hero h1 { font-size: 27px; } }
+  section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -.3px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+  section h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px; height: 34px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #7c8aff);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(91, 108, 255, .30);
+  }
+  section h3 {
+    font-size: 17.5px;
+    font-weight: 600;
+    margin: 28px 0 10px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  section h3 svg { width: 17px; height: 17px; color: var(--accent); flex-shrink: 0; }
+  section h4 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; }
+  section p { margin: 10px 0; color: var(--text-secondary); }
+  section strong { color: var(--text-primary); }
+  .section-lead { color: var(--text-muted); font-size: 13.5px; margin-top: 0; margin-bottom: 20px; }
+  .stage-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    letter-spacing: .3px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    padding: 2px 9px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  /* ============== Lists ============== */
+  section ul, section ol { color: var(--text-secondary); padding-left: 22px; margin: 10px 0; }
+  section li { margin: 5px 0; }
+  .steps { list-style: none; counter-reset: st; padding: 0; margin: 14px 0; }
+  .steps > li {
+    counter-increment: st;
+    position: relative;
+    padding: 12px 16px 12px 50px;
+    background: rgba(255, 255, 255, .55);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 14.5px;
+    color: var(--text-secondary);
+  }
+  .steps > li::before {
+    content: counter(st);
+    position: absolute;
+    left: 13px; top: 12px;
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--accent), #7c8aff);
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12.5px;
+    font-family: var(--font-mono);
+  }
+
+  /* ============== Table ============== */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-soft);
+    margin: 18px 0;
+    background: rgba(255, 255, 255, .55);
+    -webkit-overflow-scrolling: touch;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 480px; }
+  table thead { background: rgba(91, 108, 255, .06); }
+  table th {
+    text-align: left;
+    padding: 11px 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  table td {
+    padding: 11px 15px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+  table tr:last-child td { border-bottom: 0; }
+  table tr:hover td { background: rgba(91, 108, 255, .03); }
+  table code, .inline-code {
+    background: rgba(91, 108, 255, .10);
+    color: var(--accent-strong);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 12.2px;
+  }
+  table.gloss-table td:first-child {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+  table.gloss-table td:nth-child(2) { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+  .shift-table td:first-child { background: rgba(174, 174, 178, .07); }
+  .shift-table td:last-child { background: rgba(91, 108, 255, .04); }
+  .shift-table th:first-child { color: var(--text-muted); }
+  .shift-table th:last-child { color: var(--accent-strong); }
+  table.vendor-table td:first-child { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+
+  /* ============== Code Block ============== */
+  .codesnippet {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--radius-md);
+    padding: 34px 18px 16px;
+    margin: 16px 0;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.62;
+    overflow-x: auto;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(30, 32, 60, .16);
+    -webkit-overflow-scrolling: touch;
+  }
+  .codesnippet pre { margin: 0; white-space: pre; }
+  .codesnippet .code-lang {
+    position: absolute;
+    top: 9px; left: 18px;
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, .48);
+    font-family: var(--font-mono);
+    letter-spacing: .4px;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 7px; right: 10px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: rgba(255, 255, 255, .75);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .18s ease;
+    font-family: var(--font-cn);
+  }
+  .copy-btn:hover { background: rgba(255, 255, 255, .18); color: #fff; }
+  .copy-btn.copied { background: rgba(52, 199, 89, .20); color: #6ed882; border-color: rgba(52, 199, 89, .30); }
+  .copy-btn svg { width: 12px; height: 12px; vertical-align: -2px; margin-right: 3px; }
+
+  /* ============== Callout / Insight ============== */
+  .insight {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 13px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .55);
+    border: 1px solid var(--border-soft);
+    margin: 14px 0;
+  }
+  .insight.warn { background: linear-gradient(135deg, rgba(255, 149, 0, .08), rgba(255, 149, 0, .02)); border-color: rgba(255, 149, 0, .25); }
+  .insight.success { background: linear-gradient(135deg, rgba(52, 199, 89, .08), rgba(52, 199, 89, .02)); border-color: rgba(52, 199, 89, .25); }
+  .insight.danger { background: linear-gradient(135deg, rgba(255, 59, 48, .07), rgba(255, 59, 48, .02)); border-color: rgba(255, 59, 48, .25); }
+  .insight-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .insight.warn .insight-icon { background: rgba(255, 149, 0, .12); color: var(--orange); }
+  .insight.success .insight-icon { background: rgba(52, 199, 89, .12); color: var(--green); }
+  .insight.danger .insight-icon { background: rgba(255, 59, 48, .12); color: var(--red); }
+  .insight-icon svg { width: 17px; height: 17px; }
+  .insight b { display: block; margin-bottom: 2px; font-size: 14.5px; }
+  .insight p { margin: 0; font-size: 13.5px; color: var(--text-secondary); }
+
+  /* 引文 / 出处说明 */
+  .figure-note {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 10px;
+    align-items: start;
+    margin: 14px 0;
+    padding: 12px 16px;
+    border-left: 3px solid var(--gray);
+    background: rgba(174, 174, 178, .07);
+    border-radius: 0 10px 10px 0;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .figure-note svg { width: 17px; height: 17px; color: var(--gray); margin-top: 3px; }
+
+  /* ============== 机制块 ============== */
+  .play-block {
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, .48);
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .play-block > h4 {
+    margin: 0 0 8px;
+    font-size: 14.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-strong);
+  }
+  .play-block > h4 svg { width: 16px; height: 16px; }
+  .play-block > *:last-child { margin-bottom: 0; }
+  .play-block .layer-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border-radius: 5px;
+    padding: 1px 7px;
+    margin-left: auto;
+    font-weight: 700;
+  }
+
+  /* ============== 卡片网格 ============== */
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .case-card {
+    background: rgba(255, 255, 255, .62);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .case-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent), #7c8aff);
+  }
+  .case-card.alt::before { background: linear-gradient(90deg, var(--green), #7fe39a); }
+  .case-card .c-org {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .case-card .c-kind {
+    display: block;
+    font-size: 10.5px;
+    font-family: var(--font-mono);
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin-bottom: 7px;
+  }
+  .case-card.alt .c-kind { color: #1c8b3c; }
+  .case-card p { margin: 0; font-size: 13.5px; }
+  .metric-hl {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--accent-strong);
+  }
+
+  /* ============== chips ============== */
+  .prereq { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+  .prereq span {
+    font-size: 12.5px;
+    background: rgba(255, 255, 255, .66);
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    padding: 4px 12px;
+    color: var(--text-secondary);
+  }
+  .prereq span.none { color: var(--green); border-color: rgba(52, 199, 89, .3); background: rgba(52, 199, 89, .07); }
+
+  /* ============== Details / 折叠 ============== */
+  details.fold {
+    background: rgba(255, 255, 255, .60);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    margin: 14px 0;
+    overflow: hidden;
+  }
+  details.fold[open] { background: rgba(255, 255, 255, .85); }
+  details.fold > summary {
+    padding: 13px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--text-primary);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+  }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before {
+    content: '+';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  details.fold[open] > summary::before { content: '\2212'; }
+  .fold-body { padding: 0 18px 16px; font-size: 14px; color: var(--text-secondary); }
+  .fold-body > *:first-child { margin-top: 0; }
+
+  /* ============== 通道流 ============== */
+  .stage-flow { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; align-items: center; }
+  .stage-flow .sf {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, .66);
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    font-size: 13px;
+    min-width: 108px;
+  }
+  .stage-flow .sf b { font-size: 13.5px; }
+  .stage-flow .sf code { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent-strong); }
+  .stage-flow .arrow { color: var(--gray); font-size: 16px; }
+
+  /* ============== Footer ============== */
+  footer.site-footer {
+    text-align: center;
+    padding: 28px 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  footer.site-footer svg {
+    width: 17px; height: 17px;
+    vertical-align: -4px;
+    margin-right: 4px;
+    color: var(--accent);
+  }
+  footer.site-footer a { color: var(--accent-strong); text-decoration: none; }
+
+  /* ============== Refs ============== */
+  .ref-list { list-style: none; padding: 0; margin: 12px 0; }
+  .ref-list li {
+    padding: 9px 13px;
+    background: rgba(255, 255, 255, .55);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    margin-bottom: 7px;
+    font-size: 13px;
+  }
+  .ref-list a { color: var(--accent-strong); text-decoration: none; word-break: break-all; }
+  .ref-list a:hover { text-decoration: underline; }
+  .ref-list .rt { display: block; color: var(--text-primary); font-weight: 600; margin-bottom: 2px; }
+
+  /* ============== Progress + Back to top ============== */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #a78bfa, #f472b6);
+    z-index: 1000;
+    transition: width .08s linear;
+    box-shadow: 0 0 8px rgba(91, 108, 255, .5);
+  }
+  .back-to-top {
+    position: fixed;
+    right: 22px; bottom: 26px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .75);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 6px 20px rgba(30, 38, 80, .12);
+    color: var(--accent-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+    z-index: 999;
+  }
+  .back-to-top.visible { opacity: 1; pointer-events: auto; }
+  .back-to-top:hover { transform: translateY(-2px); background: #fff; }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  /* ============== Print ============== */
+  @media print {
+    body { background: #fff !important; color: #000 !important; }
+    .sidebar, .back-to-top, .progress-bar, .copy-btn, .back-link { display: none !important; }
+    .layout { display: block; max-width: 100%; padding: 0; }
+    section, .hero { box-shadow: none; border: 1px solid #ddd; background: #fff; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ============ Sidebar ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2.5"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M5 9H2"/><path d="M5 15H2"/><path d="M22 9h-3"/><path d="M22 15h-3"/><path d="M9 5V2"/><path d="M15 5V2"/></svg>
+      <div>
+        <b>MHS</b>
+        <small>Model Hardware Standard</small>
+      </div>
+    </div>
+    <ul class="toc" id="toc">
+      <li><a href="#definition"><span class="tnum">01</span>一句话定义</a></li>
+      <li><a href="#problem"><span class="tnum">02</span>它解决什么问题</a></li>
+      <li class="toc-stage">机制</li>
+      <li><a href="#mechanism"><span class="tnum">03</span>核心机制四层</a></li>
+      <li><a href="#architecture"><span class="tnum">04</span>分层架构图</a></li>
+      <li><a href="#agent-workflow"><span class="tnum">05</span>agent 如何工作</a></li>
+      <li class="toc-stage">落地</li>
+      <li><a href="#cases"><span class="tnum">06</span>早期案例</a></li>
+      <li><a href="#vendors"><span class="tnum">07</span>厂商生态</a></li>
+      <li class="toc-stage">边界</li>
+      <li><a href="#limits"><span class="tnum">08</span>已知局限与安全</a></li>
+      <li><a href="#origin"><span class="tnum">09</span>起源故事</a></li>
+      <li><a href="#mcp"><span class="tnum">10</span>与 MCP 的关系</a></li>
+        <li><a href="#external"><span class="tnum">11</span>外部视角与同期对照</a></li>
+      <li><a href="#refs"><span class="tnum">RF</span>参考资料</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <a class="back-link" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      返回技术热词时间线
+    </a>
+
+    <!-- ============ Hero ============ -->
+    <div class="hero">
+      <span class="hero-tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>
+2026-08-27 发布 · research preview · 尚未开源
+      </span>
+      <h1>MHS · Model Hardware Standard</h1>
+      <p class="en-title">Model Hardware Standard &middot; Anthropic research preview</p>
+      <p class="subtitle">
+        一份让 AI agent 安全操作物理设备的共享规范（shared specification）。它适用于任何具备可编程接口（programmable interface）的设备，把实验室与制造车间原本需要数周甚至数月的硬件集成压缩到<strong>数小时或数分钟</strong>；它是 model-agnostic 的，任何 agent harness 都能通过 MCP 等标准协议访问它。
+      </p>
+      <div class="hero-meta">
+        <span class="meta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Anthropic 官方公告
+        </span>
+        <a class="meta-chip" href="https://www.anthropic.com/news/model-hardware-standard-research-preview" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          anthropic.com/news/model-hardware-standard-research-preview
+        </a>
+      </div>
+    </div>
+
+    <!-- ============ 01 一句话定义 ============ -->
+    <section id="definition">
+      <h2><span class="num">01</span>一句话定义</h2>
+      <p class="section-lead">MHS = Model Hardware Standard，中文通用译法「模型硬件标准」——Anthropic 未做中文本地化，此译法为中文媒体沿用的事实译名，并非官方中文名。</p>
+      <div class="insight">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+        <div><b>MHS 是一份让 AI agent 安全操作物理设备的共享规范（shared specification）。</b><p>由 Anthropic 推出，适用于任何具备可编程接口（programmable interface）的设备。</p></div>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/><circle cx="12" cy="12" r="4"/></svg>定位与现状</h3>
+      <div class="table-wrap">
+        <table class="gloss-table">
+          <thead><tr><th>维度</th><th>结论</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>形态</td><td>shared specification</td><td>一份共享规范，而不是某个单独产品</td></tr>
+            <tr><td>阶段</td><td>research preview</td><td>研究预览，先开放给一批科研实验室与先进制造企业</td></tr>
+            <tr><td>开源状态</td><td>尚未开源</td><td>Anthropic 明确表示开源前还有工作要做；当前需申请加入 waitlist</td></tr>
+            <tr><td>适用范围</td><td>可编程接口设备</td><td>任何具备 programmable interface 的设备</td></tr>
+            <tr><td>模型耦合</td><td>model-agnostic</td><td>与模型无关，任何 agent harness 都能通过 MCP 等标准协议访问它</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="insight warn">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div><b>现在还不是「拿来就用」的阶段</b><p>MHS 处于 research preview，尚未开源，访问方式是申请加入 waitlist。Anthropic 表示在开源之前还有工作要做，并会把研究预览期的发现作为安全部署指引的一部分一并发布。</p></div>
+      </div>
+    </section>
+
+    <!-- ============ 02 它解决什么问题 ============ -->
+    <section id="problem">
+      <h2><span class="num">02</span>它解决什么问题</h2>
+      <p class="section-lead">三个叠在一起的问题：集成耗时、设备互不通信、没有统一方式让 agent 安全操作它们。</p>
+
+      <div class="table-wrap">
+        <table class="shift-table">
+          <thead><tr><th>MHS 之前</th><th>MHS 之后</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>在实验室或制造车间配置并集成硬件，通常要<strong>数周甚至数月</strong>。多数设备之间无法互相通信，需要专家逐个搭建定制集成。</td>
+              <td>MHS 把这类集成工作压缩到<strong>数小时或数分钟</strong>。设备与 agent 能跨网络互相发现并通信，中间不需要定制的「翻译器」程序。</td>
+            </tr>
+            <tr>
+              <td>即便设备连通了，也没有统一方式让它们与 AI agent 共享数据，或让 agent 安全地操作它们。</td>
+              <td>driver 自动生成的 reference file 告诉 agent：设备能测什么、能调什么、会强制执行哪些安全上限。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>三层障碍</h3>
+      <ol class="steps">
+        <li><strong>集成耗时。</strong>硬件的配置与集成按周、按月计，每一套装置都要专家动手做定制集成。</li>
+        <li><strong>设备互不通信。</strong>多数设备之间无法互相通信，每加一台仪器就要再搭一次桥。</li>
+        <li><strong>没有统一的 agent 接口。</strong>设备即使连上了，也缺少统一方式与 AI agent 共享数据，或让 agent 安全地操作它们。</li>
+      </ol>
+    </section>
+
+    <!-- ============ 03 核心机制四层 ============ -->
+    <section id="mechanism">
+      <span class="stage-badge">机制</span>
+      <h2><span class="num">03</span>核心机制四层</h2>
+      <p class="section-lead">标准化 driver、标准格式的可发现性、设备自描述、三种控制通道。四层叠起来才构成 MHS。</p>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>标准化 driver<span class="layer-tag">LAYER 1</span></h4>
+        <p>driver 是在操作系统与硬件设备之间做翻译的软件。MHS driver 用一套简单原语——<code class="inline-code">read</code>（如 &quot;get temperature&quot;）与 <code class="inline-code">write</code>（如 &quot;set temperature&quot;）——任何硬件都能理解并执行。</p>
+        <div class="stage-flow">
+          <span class="sf"><b>read</b><code>get temperature</code></span>
+          <span class="arrow">·</span>
+          <span class="sf"><b>write</b><code>set temperature</code></span>
+        </div>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/><path d="M7.76 16.24a6 6 0 0 1 0-8.49"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>标准格式的可发现性<span class="layer-tag">LAYER 2</span></h4>
+        <p>让设备与 agent 能<strong>跨网络互相发现并通信</strong>，中间不需要定制的「翻译器」程序。这一层取代的正是过去那种「每两台设备之间手搓一个中间件」的做法。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>设备自描述<span class="layer-tag">LAYER 3</span></h4>
+        <p>driver 帮 agent 理解<strong>它从未见过的设备</strong>，提供那些光看代码看不出来的机器特性。原文的例子是机械臂的重量——这对安全操纵它很重要。</p>
+        <p>这类信息过去多存在纸质手册里、存在某个人的个人电脑里，或者只是默会知识。MHS driver 提供 tag，用户可以直接用自然语言把这些信息写进去：自己写，或者与一个「访谈式询问硬件配置」的 agent 对话完成。</p>
+        <p>driver 据此自动生成一份 <strong>reference file</strong>，记录设备的通用特性：</p>
+        <ul>
+          <li>能测什么</li>
+          <li>能调什么</li>
+          <li>会强制执行哪些安全上限</li>
+        </ul>
+        <p>agent 靠这份文件就知道该如何操作设备。</p>
+      </div>
+
+      <div class="play-block">
+        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>三种控制通道<span class="layer-tag">LAYER 4</span></h4>
+        <p>MCP、命令行界面（CLI）、代码文件（API）。三者协同，使跨多设备的编排可以通过<strong>单行代码</strong>完成。</p>
+        <div class="stage-flow">
+          <span class="sf"><b>MCP</b><code>协议访问</code></span><span class="arrow">+</span>
+          <span class="sf"><b>CLI</b><code>命令行界面</code></span><span class="arrow">+</span>
+          <span class="sf"><b>API</b><code>代码文件</code></span><span class="arrow">→</span>
+          <span class="sf"><b>多设备编排</b><code>单行代码</code></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 04 分层架构图 ============ -->
+    <section id="architecture">
+      <span class="stage-badge">机制</span>
+      <h2><span class="num">04</span>分层架构图</h2>
+      <p class="section-lead">agent / 三种控制通道 / MHS driver / 设备，四层的关系。此图为对官方描述的结构化整理，非官方原图。</p>
+
+      <div class="codesnippet">
+        <span class="code-lang">ascii &middot; MHS 分层结构</span>
+        <button class="copy-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>复制</button>
+<pre>┌──────────────────────────────────────────────────────────────┐
+│  AI agent（model-agnostic，任何 agent harness）              │
+│  · 接收各设备运行数据，在高层监督并指挥工作                  │
+│  · 跨仪器排布步骤 / 监控结果 / 随条件实时调参                │
+└───────────────────────────┬──────────────────────────────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        │                   │                   │
+┌───────┴──────┐   ┌────────┴───────┐   ┌───────┴────────┐
+│     MCP      │   │      CLI       │   │  代码文件 API  │
+│  标准协议访问│   │  命令行界面    │   │  driver 命令串 │
+└───────┬──────┘   └────────┬───────┘   └───────┬────────┘
+        │                   │                   │
+        └───────────────────┼───────────────────┘
+                            │  三者协同：跨多设备编排 = 单行代码
+┌───────────────────────────┴──────────────────────────────────┐
+│  MHS driver（OS 与硬件之间的翻译层）                         │
+│  原语： read（get temperature） / write（set temperature）    │
+│  可发现性：标准格式，跨网络互相发现，无需定制翻译器          │
+│  自描述： 自然语言 tag ──▶ reference file                    │
+│           （能测什么 / 能调什么 / 强制哪些安全上限）         │
+└───────────────────────────┬──────────────────────────────────┘
+                            │
+┌───────────────────────────┴──────────────────────────────────┐
+│  设备（任何具备 programmable interface 的硬件）              │
+│  液体处理仪 · 机械臂 · 酶标仪 · 显微镜 · 激光器 · 摄像头 …    │
+└──────────────────────────────────────────────────────────────┘</pre>
+      </div>
+
+      <div class="figure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>说明：上图由官方公告所述的四层机制整理而成，用于理解层间关系；官方公告本身未给出此形式的架构图。</div>
+      </div>
+    </section>
+
+    <!-- ============ 05 agent 如何工作 ============ -->
+    <section id="agent-workflow">
+      <span class="stage-badge">机制</span>
+      <h2><span class="num">05</span>agent 如何工作</h2>
+      <p class="section-lead">高层监督与指挥，而不是每一步都亲自推理。长时任务与高速控制则交给 agent 生成的代码文件。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>在高层监督并指挥</h3>
+      <p>agent 接收各设备的运行数据，在高层监督并指挥工作：</p>
+      <ul>
+        <li>跨仪器排布步骤</li>
+        <li>监控结果</li>
+        <li>随条件实时调参</li>
+      </ul>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>把 driver 命令串成代码文件</h3>
+      <p>遇到长时任务、或者需要比在线推理更快地操作设备时，agent 可以把一个或多个设备的 driver 命令串成一个代码文件，让设备<strong>自行执行</strong>，无需 agent 每步都推理。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>实测观察：Claude 会像科学家那样探索</h3>
+      <p>Anthropic 的实测观察是：Claude 会以探索性方式与实验和硬件交互，很像科学家。原文给出的案例是激光对准：</p>
+      <ol class="steps">
+        <li>Claude 调整激光器。</li>
+        <li>通过摄像头观察调整如何移动了激光束。</li>
+        <li>反复迭代，以理解事件序列。</li>
+        <li>随后把学到的东西打包成一个代码文件，写出一个确定性脚本。</li>
+        <li>激光对准从此无需每步推理，整个过程可作为<strong>单条命令</strong>运行。</li>
+      </ol>
+      <div class="insight success">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><b>探索一次，之后确定性执行</b><p>先用推理摸清硬件的行为，再把结论沉淀成脚本——这样既拿到了理解，也拿到了速度。</p></div>
+      </div>
+    </section>
+
+    <!-- ============ 06 早期案例 ============ -->
+    <section id="cases">
+      <span class="stage-badge">落地</span>
+      <h2><span class="num">06</span>早期案例</h2>
+      <p class="section-lead">research preview 参与方的自述，如实转述。以下 6 例来自官方公告。</p>
+
+      <div class="case-grid">
+        <div class="case-card">
+          <span class="c-kind">生物制药</span>
+          <span class="c-org">Genentech</span>
+          <p>把 MHS 用于 <strong>BCA 蛋白定量</strong>实验（测样本总蛋白浓度的标准流程）自动化的概念验证，需协调液体处理仪、机械臂与酶标仪。</p>
+        </div>
+        <div class="case-card">
+          <span class="c-kind">学术实验室</span>
+          <span class="c-org">华盛顿大学 Baker &amp; Pinglay 实验室</span>
+          <p>博士生 Zihao Song 用 MHS 建了远程监控仪器的看板；做了 AI agent 监督的 <strong>qPCR</strong>（通过反复升降温复制目标 DNA 序列），agent 盯着扩增曲线并在恰当时机终止流程；还打通机械臂与液体处理仪，实现无碰撞的板转移。</p>
+        </div>
+        <div class="case-card">
+          <span class="c-kind">学术实验室</span>
+          <span class="c-org">卡内基梅隆大学（CMU）</span>
+          <p>用 MHS 跑系列稀释的剂量-反应实验，比此前<span class="metric-hl">约快三倍</span>。由一个 AI agent 编排液体处理仪、酶标仪、机械臂与监控摄像头——这些设备分布在<strong>三台接口根本不兼容的电脑</strong>上。</p>
+        </div>
+        <div class="case-card">
+          <span class="c-kind">研究机构</span>
+          <span class="c-org">HHMI Janelia</span>
+          <p>多个显微成像项目在用 MHS 加速。Ahrens 实验室科学家 Virginie Ruetten（研究睡眠如何帮助身体从压力中恢复）用 MHS 统一并编排了一套此前需要<strong>七个不同厂商程序</strong>、彼此无共享接口的实验装置。</p>
+        </div>
+        <div class="case-card alt">
+          <span class="c-kind">量子计算</span>
+          <span class="c-org">QuEra Computing</span>
+          <p>用中性原子造量子计算机。用 MHS 让 AI agent 控制其量子机器内部的部分激光系统；agent 开发出一个控制器，能在 <span class="metric-hl">99.3%</span> 的情况下无需人工干预就恢复激光的「锁定」——即激光必须保持的、用于与原子相互作用的超精密频率。</p>
+        </div>
+        <div class="case-card alt">
+          <span class="c-kind">实验自动化</span>
+          <span class="c-org">Tetsuwan Scientific</span>
+          <p>把 MHS 集成进其自动化生物实验平台 <strong>ResearchOS</strong>，编排 qPCR 工作流，用于表征加州 San Pedro Creek 污染状况的公民科学项目。</p>
+        </div>
+      </div>
+
+      <div class="figure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <div>以上均为各方自述，效果数字（约三倍、99.3%）来自官方公告原文，未经独立复现。</div>
+      </div>
+    </section>
+
+    <!-- ============ 07 厂商生态 ============ -->
+    <section id="vendors">
+      <span class="stage-badge">落地</span>
+      <h2><span class="num">07</span>厂商生态</h2>
+      <p class="section-lead">正在把 MHS 支持做进设备与平台的厂商，以及公告提到的后续早期采用者。</p>
+
+      <div class="table-wrap">
+        <table class="vendor-table">
+          <thead><tr><th>厂商</th><th>在做的事</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>AWS</td>
+              <td>通过 <strong>Strands Robots</strong>（连接 AI agent 与物理设备的库）支持 MHS；研究预览期间向参与者提供该包的私有预发布版。</td>
+            </tr>
+            <tr>
+              <td>Automata</td>
+              <td>为其实验室自动化平台 <strong>LINQ</strong> 加 MHS 支持，用于自主实验室中仪器的智能错误处理。</td>
+            </tr>
+            <tr>
+              <td>Danaher</td>
+              <td>与 Anthropic 共同探索 MHS 能力如何让其智能仪器与自主实验室规模化支撑生物医学研发。</td>
+            </tr>
+            <tr>
+              <td>Doosan Robotics</td>
+              <td>在机械臂上测试 MHS，含自动化质检与多机器人任务协调。</td>
+            </tr>
+            <tr>
+              <td>MBF Bioscience</td>
+              <td>为 <strong>ScanImage</strong>（全球数百个神经科学实验室用来驱动激光扫描显微镜的软件）构建 MHS driver。</td>
+            </tr>
+            <tr>
+              <td>QIAGEN</td>
+              <td>在其核酸纯化平台 <strong>QIAsymphony Connect</strong> 上做概念验证，展示 AI agent 如何帮实验室更快排查仪器问题、引导操作员恢复、提升仪器可用率并降低生物样本风险。</td>
+            </tr>
+            <tr>
+              <td>Tecan</td>
+              <td>为 <strong>Fluent</strong> 液体处理平台加 MHS 支持。</td>
+            </tr>
+            <tr>
+              <td>Universal Robots</td>
+              <td>已提前获得访问权限，计划在其机器人平台加入支持。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>后续早期采用者</h3>
+      <div class="case-grid">
+        <div class="case-card alt">
+          <span class="c-kind">机器人库</span>
+          <span class="c-org">Hugging Face</span>
+          <p>在其机器人库 <strong>LeRobot</strong> 中加 MHS 支持。</p>
+        </div>
+        <div class="case-card alt">
+          <span class="c-kind">硬件平台</span>
+          <span class="c-org">Raspberry Pi</span>
+          <p>用其 <strong>Camera MHS Driver</strong> 测试成功后，正在多个产品上启用 MHS 集成。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 08 已知局限与安全 ============ -->
+    <section id="limits">
+      <span class="stage-badge">边界</span>
+      <h2><span class="num">08</span>已知局限与安全</h2>
+      <p class="section-lead">这部分是官方公告明确写出的边界，不宜省略或轻描淡写。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>模型侧的局限</h3>
+      <div class="insight warn">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+        <div><b>空间与物理推理存在局限，仍需专家监督</b><p>作为大语言模型，Claude 是通过文本与图像来认识物理世界的。</p></div>
+      </div>
+      <div class="figure-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <div>原文案例：Genentech 的研究者处理蛋白样本时，必须引导 Claude 认识到——样本起泡导致的错误是<strong>物理故障</strong>、不是软件 bug，只能通过恰当的物理修正来缓解。</div>
+      </div>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>覆盖面的局限</h3>
+      <p>MHS 目前<strong>不支持缺少编程接口的硬件</strong>。Anthropic 正与此类设备的制造商合作，把 MHS driver 内建进去。</p>
+
+      <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>安全工作</h3>
+      <ul>
+        <li>Anthropic 正与首批合作方共同建立<strong>额外的安全评估</strong>，强化物理世界中 AI 使用的保护措施。</li>
+        <li>正在制定一份<strong>物理安全路线图</strong>，以增强其安全防护政策与针对滥用风险的执行覆盖。</li>
+        <li>开源 MHS 时，会把研究预览期的发现作为<strong>安全部署指引</strong>的一部分一并发布。</li>
+      </ul>
+    </section>
+
+    <!-- ============ 09 起源故事 ============ -->
+    <section id="origin">
+      <span class="stage-badge">边界</span>
+      <h2><span class="num">09</span>起源故事</h2>
+      <p class="section-lead">来自官方公告的 Acknowledgments 段。</p>
+
+      <ol class="steps">
+        <li>MHS 起初是 Anthropic「<strong>Beneficial Deployments</strong>」团队的 <strong>Alek Kemeny</strong> 与 HHMI Janelia 研究园区博士后科学家 <strong>Arco Bast</strong> 的一次合作。</li>
+        <li>Bast 当时在一套混合了激光器、电动调焦器与不同厂商专用相机、<strong>彼此无共同接口</strong>的装置上做复杂脑成像实验。</li>
+        <li>为加速实验，他开发了一个 <strong>shared memory dictionary</strong>，让这些仪器能以内存速度互相通信。</li>
+        <li>Kemeny 与 Bast 合作，把 AI 模型集成进那个接口。</li>
+      </ol>
+
+      <details class="fold">
+        <summary>原文致谢名单</summary>
+        <div class="fold-body">
+          <div class="prereq">
+            <span>Aaron Boswell</span>
+            <span>Ben Arthur</span>
+            <span>Boaz Mohar</span>
+            <span>Gagan Bhat</span>
+            <span>Mark Kittisopikul</span>
+            <span>Nadine Yasser</span>
+            <span>Nick Purcell</span>
+            <span>Takashi Kawase</span>
+            <span>Virginie Ruetten</span>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ 10 与 MCP 的关系 ============ -->
+    <section id="mcp">
+      <span class="stage-badge">边界</span>
+      <h2><span class="num">10</span>与 MCP 的关系</h2>
+      <p class="section-lead">先区分两层：公告原文写了什么，以及 Anthropic 员工对外怎么定调。</p>
+
+      <h3>公告原文支持的三条事实</h3>
+      <ul>
+        <li>MHS 是 <strong>model-agnostic</strong> 的（与模型无关）。</li>
+        <li>任何 agent harness 都能<strong>通过 MCP 等标准协议</strong>访问 MHS。</li>
+        <li>MCP 是 MHS <strong>三种控制通道之一</strong>，另两种是命令行界面（CLI）与代码文件（API）。</li>
+      </ul>
+
+      <h3>「MCP 之于软件，MHS 之于硬件」这个类比</h3>
+      <p>这个广为流传的类比<strong>不是媒体自创，而是 Anthropic 方面主动定调</strong>：Anthropic 的 Alek Kemeny 对 Bloomberg 表示「What MCP did for software, MHS will do for the hardware world」（经 Quartz 转引）；他对 Fortune 另称 MCP 是「AI 到软件连接的 USB」。CNBC 的报道则用 USB-C 作类比。此后该类比被各家报道普遍复用。</p>
+
+      <div class="insight warn">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div><b>引用这个类比时的两点注意</b><p>其一，它出自员工受访表态与媒体转引，<strong>不是公告原文的表述</strong>，两者不宜混为一谈。其二，Kemeny 的原话经 Quartz 转引 Bloomberg，Bloomberg 原文在付费墙后未直接核验，严谨引用时应标注转引链条。</p></div>
+      </div>
+    </section>
+
+    <!-- ============ 11 外部视角与同期对照 ============ -->
+    <section id="external">
+      <span class="stage-badge">边界</span>
+      <h2><span class="num">11</span>外部视角与同期对照</h2>
+      <p class="section-lead">本节内容全部来自官方公告之外的来源，性质与前面各节不同，逐条标注了它是谁的说法。</p>
+
+      <h3>「这不就是又一个标准吗」——与既有标准的对比质疑</h3>
+      <p>公告发布当天，Hacker News 主帖（136 分 / 62 评论）的讨论集中在一个问题上：实验室与工业自动化领域早已有 SiLA 2、OPC UA、ROS 2 等标准，MHS 是否只是重复发明。有用户给出了一张分层定位图，把 MHS 放在既有标准之上而非替代它们：</p>
+
+      <div class="codesnippet">
+        <span class="code-lang">Hacker News 用户 randomblock1 给出的分层定位</span>
+<pre>Agent
+  ↕  MCP / CLI / code files
+MHS
+  ↕  vendor API / SCPI / OPC UA / ROS
+CAN / Modbus / USB
+  ↕
+hardware</pre>
+      </div>
+      <p class="figure-note">该图为社区用户的理解，非官方架构说明。</p>
+
+      <p>同一讨论中的其他观点：有人直言「这就是 OPC UA / SiLA，只是换成了 AI 与机器之间的语义」并配上 xkcd/927（关于「标准太多，于是我们再造一个统一标准」的经典调侃）；有人问它「与 ROS 2 的目标基本相同」；也有人称设备自描述「USB HID 早就做了」。ROS 官方 Discourse 上另有专帖讨论 MHS 与 ROS 2 的层次关系，一位 URML 维护者把 MHS 定位为「Layer-0 的驱动与描述标准，与 URDF/SDF 同族」。</p>
+
+      <div class="insight warn">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div><b>这些都是个人观点，不是机构立场</b><p>上述对比与质疑目前只见于 Hacker News 评论与 ROS Discourse 的单个帖子，属发言者个人看法。<strong>未找到 SiLA Consortium 或 OPC Foundation 就 MHS 发表的任何官方立场</strong>，不要把社区观点当作机构表态引用。</p></div>
+      </div>
+
+      <h3>治理层面的两条批评</h3>
+      <ul>
+        <li><strong>「标准未公开，却叫 standard」</strong>——有用户指出 USB、CAN 这类标准由厂商联盟共同制定、规范公开可读，而 MHS 当前需申请审批才能获取，质疑其称为「标准」的正当性。</li>
+        <li><strong>「先训练优势」</strong>——有用户认为 Anthropic 借研究预览期获得数月的提前期，可先用这些数据后训练自己的模型，从而在自己定义的赛道上领跑。</li>
+      </ul>
+      <p>这两条同样来自 Hacker News 用户，是观点而非事实认定。Anthropic 在公告中自陈正在制定物理安全路线图、并会在开源前先建立安全评估。</p>
+
+      <h3>同期定位相近的其他工作</h3>
+      <table class="vendor-table">
+        <thead><tr><th>名称</th><th>提出方</th><th>时间</th><th>与 MHS 的关系</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Lab Agent Protocol（LAP）</td>
+            <td>学界提案（arXiv 2606.03755）</td>
+            <td>2026-06</td>
+            <td>最直接的同层对照。明确指出 MCP 管 agent-to-tool、Google A2A 管 agent-to-agent，缺的是 agent-to-instrument 这条边；LAP 补上 InstrumentCard、独占预约、safety-fence 握手、带单位与不确定度的 MeasurementResult，并声明是封装而非替代 SiLA 2 / OPC-UA</td>
+          </tr>
+          <tr>
+            <td>OPC UA for AI</td>
+            <td>OPC Foundation</td>
+            <td>2026-04</td>
+            <td>把 430+ Companion Specifications 转为 RAG / MCP 可用格式，走「既有工业语义层 + MCP」路线，而非新造标准</td>
+          </tr>
+          <tr>
+            <td>ros-mcp-server</td>
+            <td>开源社区（robotmcp）</td>
+            <td>2025-09</td>
+            <td>把 ROS topics / services / actions 暴露为 MCP tools，是社区自发的「MCP 接机器人」实践，早于 MHS 但没有标准化意图</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>截至目前，<strong>未发现 Google、OpenAI、NVIDIA 等推出官方的同定位「AI agent 操作物理设备」标准</strong>。NIST CAISI 于 2026-02 启动了「AI Agent Standards Initiative」，关注 agent 标准与安全，但未点名 MHS 或物理设备。也未检索到任何针对 MHS 点名的监管文件或政府回应。</p>
+    </section>
+
+    <!-- ============ 参考资料 ============ -->
+    <section id="refs">
+      <h2><span class="num">RF</span>参考资料</h2>
+      <p class="section-lead">第 01–10 节的事实全部来自官方公告；第 11 节来自下列外部来源，其中社区讨论与学界提案的性质已在该节逐条标注。</p>
+
+      <h3>一手来源</h3>
+      <ul class="ref-list">
+        <li>
+          <span class="rt">Anthropic《Previewing the Model Hardware Standard》（官方公告，本页 01–10 节的事实来源）</span>
+          <a href="https://www.anthropic.com/news/model-hardware-standard-research-preview" target="_blank" rel="noopener">https://www.anthropic.com/news/model-hardware-standard-research-preview</a>
+        </li>
+        <li>
+          <span class="rt">MHS 官方站（研究预览申请入口）</span>
+          <a href="https://www.modelhardwarestandard.com/" target="_blank" rel="noopener">https://www.modelhardwarestandard.com/</a>
+        </li>
+      </ul>
+
+      <h3>二手来源（媒体报道与社区讨论）</h3>
+      <ul class="ref-list">
+        <li>
+          <span class="rt">CNBC（2026-08-27，采访 Anthropic beneficial deployments 负责人 Elizabeth Kelly，用 USB-C 类比）</span>
+          <a href="https://www.cnbc.com/2026/08/27/anthropic-pushes-into-physical-world-with-new-standard-to-help-ai-agents-operate-machines.html" target="_blank" rel="noopener">cnbc.com/2026/08/27/anthropic-pushes-into-physical-world…</a>
+        </li>
+        <li>
+          <span class="rt">Fortune（2026-08-27，Kemeny 称 MCP 是「AI 到软件连接的 USB」）</span>
+          <a href="https://fortune.com/2026/08/27/anthropic-makes-first-move-into-physical-ai-with-universal-standard-for-scientists-manufacturing/" target="_blank" rel="noopener">fortune.com/2026/08/27/anthropic-makes-first-move-into-physical-ai…</a>
+        </li>
+        <li>
+          <span class="rt">Quartz（转引 Bloomberg，Kemeny「What MCP did for software, MHS will do for the hardware world」）</span>
+          <a href="https://qz.com/anthropic-model-hardware-standard-ai-robots-lab-equipment-082826" target="_blank" rel="noopener">qz.com/anthropic-model-hardware-standard-ai-robots-lab-equipment-082826</a>
+        </li>
+        <li>
+          <span class="rt">Hacker News 主帖（2026-08-27，与 SiLA 2 / OPC UA / ROS 2 / USB HID 的对比与治理层批评，均为用户个人观点）</span>
+          <a href="https://news.ycombinator.com/item?id=49468834" target="_blank" rel="noopener">news.ycombinator.com/item?id=49468834</a>
+        </li>
+        <li>
+          <span class="rt">ROS Discourse 专帖（讨论 intent-validation 层与 MHS / ROS 2 的层次关系，发帖者为 URML 维护者，非官方结论）</span>
+          <a href="https://discourse.openrobotics.org/t/where-does-an-intent-validation-layer-sit-relative-to-anthropics-model-hardware-standard-and-to-ros-2/57725" target="_blank" rel="noopener">discourse.openrobotics.org/t/…/57725</a>
+        </li>
+        <li>
+          <span class="rt">Lab Agent Protocol（arXiv 2606.03755，2026-06-02，学界提案）</span>
+          <a href="https://arxiv.org/abs/2606.03755" target="_blank" rel="noopener">arxiv.org/abs/2606.03755</a>
+        </li>
+        <li>
+          <span class="rt">OPC Foundation 推进 OPC UA for AI（2026-04-20）</span>
+          <a href="https://www.automation.com/article/opc-foundation-advances-opc-ua-ai-era-companion-specifications-optimized-agentic-ai" target="_blank" rel="noopener">automation.com/article/opc-foundation-advances-opc-ua-ai-era…</a>
+        </li>
+        <li>
+          <span class="rt">ros-mcp-server（开源社区，2025-09 Show HN）</span>
+          <a href="https://github.com/robotmcp/ros-mcp-server" target="_blank" rel="noopener">github.com/robotmcp/ros-mcp-server</a>
+        </li>
+        <li>
+          <span class="rt">NIST CAISI「AI Agent Standards Initiative」（2026-02，未点名 MHS，仅作背景）</span>
+          <a href="https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure" target="_blank" rel="noopener">nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative…</a>
+        </li>
+      </ul>
+      <div class="insight">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></div>
+        <div><b>命名说明</b><p>正式全称仅为 Model Hardware Standard，缩写 MHS，没有更长的展开式。<strong>Anthropic 未做该公告的中文本地化</strong>（<code class="inline-code">/zh-CN</code>、<code class="inline-code">/zh-TW</code>、<code class="inline-code">/zh-Hans</code> 路径均 404），因此不存在官方中文译名。「模型硬件标准」是中文媒体与百科采用的<strong>事实通用译法</strong>，与既有的「模型上下文协议（MCP）」译名体系一致，本页沿用它，但它不是官方译名。</p></div>
+      </div>
+      <div class="insight warn">
+        <div class="insight-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div><b>发布日期的考据</b><p>官方公告发布于 <strong>2026-08-27</strong>（美国东部时间周四）。该页面没有结构化日期标记（无 JSON-LD、无 <code class="inline-code">article:published_time</code>、无 <code class="inline-code">&lt;time&gt;</code> 元素），日期取自正文标题下的 byline 文本，并经四路交叉验证：Anthropic news 列表页的排序位置（前后为 8/31 与 8/14 两篇）、官方 X 宣发帖、Wayback Machine 首次抓取时间戳 <code class="inline-code">20260827175718</code>（UTC，换算 EDT 13:57），以及 CNBC 与 Fortune 同日报道中的「on Thursday」——2026-08-27 确为周四。未发现任何矛盾的候选日期。</p></div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2.5"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M5 9H2"/><path d="M22 15h-3"/></svg>
+      MHS · Model Hardware Standard · 中文转述自 Anthropic 官方公告 &nbsp;|&nbsp; <a href="index.html">返回技术热词时间线</a>
+    </footer>
+  </main>
+</div>
+
+<!-- ============ Reading Progress + Back to Top ============ -->
+<div class="progress-bar" id="progressBar" aria-hidden="true"></div>
+<button class="back-to-top" id="backToTop" type="button" aria-label="回到顶部" title="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+  // ============ 侧边栏 active state 跟随滚动 ============
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('#toc a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        tocLinks.forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, {
+    rootMargin: '-25% 0px -65% 0px',
+    threshold: 0
+  });
+
+  sections.forEach((s) => observer.observe(s));
+
+  // 点击 TOC 立刻高亮（防止平滑滚动期间观察者延迟）
+  tocLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      tocLinks.forEach((l) => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+
+  // ============ 阅读进度条 + 回到顶部 ============
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+
+  function onScroll() {
+    const doc = document.documentElement;
+    const scrolled = doc.scrollTop || document.body.scrollTop;
+    const max = (doc.scrollHeight - doc.clientHeight) || 1;
+    progressBar.style.width = Math.min(100, (scrolled / max) * 100) + '%';
+    backToTop.classList.toggle('visible', scrolled > 600);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ============ 代码块复制按钮 ============
+  document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const pre = btn.parentElement.querySelector('pre');
+      if (!pre) return;
+      const text = pre.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const original = btn.innerHTML;
+      btn.classList.add('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>已复制';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = original;
+      }, 1600);
+    });
+  });
+</script>
+</body>
+</html>
+

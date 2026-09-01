@@ -5,8 +5,8 @@
 <p align="center">
   <a href="https://awch-d.github.io/AI-Tech-Timeline/"><img src="https://img.shields.io/badge/GitHub%20Pages-live-5b6cff?style=flat-square" alt="pages"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-34c759?style=flat-square" alt="license"/></a>
-  <img src="https://img.shields.io/badge/热词-31-ff9500?style=flat-square" alt="entries"/>
-  <img src="https://img.shields.io/badge/手册-5-af52de?style=flat-square" alt="handbooks"/>
+  <img src="https://img.shields.io/badge/热词-32-ff9500?style=flat-square" alt="entries"/>
+  <img src="https://img.shields.io/badge/手册-6-af52de?style=flat-square" alt="handbooks"/>
   <img src="https://img.shields.io/badge/format-single--html-1d1d1f?style=flat-square" alt="single html"/>
   <img src="https://img.shields.io/badge/lang-中文-ff3b30?style=flat-square" alt="zh-CN"/>
 </p>
@@ -35,7 +35,7 @@
 
 ---
 
-## 🗓 收录概览（31 个热词）
+## 🗓 收录概览（32 个热词）
 
 | 年份 | 热词（按时间顺序） |
 |---|---|
@@ -43,13 +43,13 @@
 | 2023 | 插件机制、自主智能体、函数调用、检索增强生成 📕、向量数据库、多模态大模型、GPTs / Assistants API |
 | 2024 | 文生视频、长上下文、智能体工作流、智能体化 RAG、推理模型、电脑操作智能体、模型上下文协议（MCP） |
 | 2025 | 开源推理模型（DeepSeek-R1）、氛围编程、深度研究、挽具工程、通用智能体、智能体互联协议（A2A）、智能体编程、上下文工程、子代理编排、规格驱动开发、智能体技能 |
-| 2026 | 智能体环境工程 📕、可执行本体 📕、循环工程 📕、AI Native SDLC 📕 |
+| 2026 | 智能体环境工程 📕、可执行本体 📕、循环工程 📕、AI Native SDLC 📕、MHS 模型硬件标准 📕 |
 
 > 📕 = 已有完整手册详情页；其余条目已收录进时间线，专属详情页按同一标准陆续补齐。
 
 ---
 
-## 📕 完整手册（5 份）
+## 📕 完整手册（6 份）
 
 以下热词已有完整的中文学习页，内容深度对齐独立 handbook 标准：
 
@@ -60,6 +60,7 @@
 | 可执行本体 Executable Ontology | [executable-ontology.html](https://awch-d.github.io/AI-Tech-Timeline/executable-ontology.html) | 由 Executable-Ontology-Handbook 合并而来 |
 | 智能体环境工程 | [agentic-environment-engineering.html](https://awch-d.github.io/AI-Tech-Timeline/agentic-environment-engineering.html) | 由同名 handbook 仓库合并而来 |
 | AI Native SDLC | [ai-native-sdlc.html](https://awch-d.github.io/AI-Tech-Timeline/ai-native-sdlc.html) | Claude Academy《The AI-Native SDLC Playbook》14 课完整中文转述，含 67 条术语对照表 |
+| MHS 模型硬件标准 | [mhs.html](https://awch-d.github.io/AI-Tech-Timeline/mhs.html) | Anthropic 官方公告中文转述，含核心机制、6 个早期案例、厂商生态，以及与 SiLA 2 / OPC UA / ROS 2 的外部对比视角 |
 
 ---
 
@@ -69,6 +70,7 @@
 AI-Tech-Timeline/
 ├── index.html                          # 时间线主页（数据内嵌于页面 DATA 数组）
 ├── ai-native-sdlc.html                 # AI Native SDLC 手册（Claude Academy 课程中文转述）
+├── mhs.html                            # MHS 模型硬件标准手册（Anthropic 官方公告中文转述）
 ├── rag.html                            # 检索增强生成（RAG）手册
 ├── executable-ontology.html            # 可执行本体手册
 ├── loop-engineering.html               # 循环工程手册
